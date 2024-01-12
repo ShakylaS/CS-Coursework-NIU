@@ -1,0 +1,253 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2759
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;\red192\green192\blue192;\red128\green0\blue0;\red128\green0\blue128;
+\red0\green0\blue255;\red10\green112\blue112;}
+{\*\expandedcolortbl;;\csgenericrgb\c75294\c75294\c75294;\csgenericrgb\c50196\c0\c0;\csgenericrgb\c50196\c0\c50196;
+\csgenericrgb\c0\c0\c100000;\csgenericrgb\c3922\c43922\c43922;}
+\margl1440\margr1440\vieww37220\viewh22880\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs24 \cf2 //\cf0 KC03CADA \cf3 JOB\cf0  ,\cf4 'S. SMITH-BARDNEY'\cf0 ,\cf5 MSGCLASS\cf0 =H\
+\pard\pardeftab720\partightenfactor0
+\cf6 //*\cf0 \
+\cf6 //*******************************************************************\cf0 \
+\cf6 //*                                                                 *\cf0 \
+\cf6 //*  CSCI 465 PE1       ASSIGNMENT 4            Fall 2023           *\cf0 \
+\cf6 //*                   COBOL Introduction                            *\cf0 \
+\cf6 //*                                                                 *\cf0 \
+\cf6 //*  DEVELOPER NAME: SHAKYLA SMITH-BARDNEY                          *\cf0 \
+\cf6 //*        DUE DATE: 10/11/2023                                     *\cf0 \
+\cf6 //*                                                                 *\cf0 \
+\cf6 //*  PURPOSE: This COBOL program will create a report based on info *\cf0 \
+\cf6 //*           contained in a input file with a unknown number of    *\cf0 \
+\cf6 //*           records.                                              *\cf0 \
+\cf6 //*                                                                 *\cf0 \
+\cf6 //*                                                                 *\cf0 \
+\cf6 //*******************************************************************\cf0 \
+\cf6 //*\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 //\cf0 STEP01  \cf3 EXEC\cf0  \cf5 PGM\cf0 =IGYCRCTL,\cf5 REGION\cf0 =0M\
+\pard\pardeftab720\partightenfactor0
+\cf6 //*\cf0 \
+\cf6 //*******************************************************************\cf0 \
+\cf6 //*                                                                 *\cf0 \
+\cf6 //* STEP01 COMPILES THE COBOL SOURCE CODE USING THE CURRENT COBOL   *\cf0 \
+\cf6 //* COMPILER.                                                       *\cf0 \
+\cf6 //*                                                                 *\cf0 \
+\cf6 //* DD NAME             FILE DESCRIPTION                            *\cf0 \
+\cf6 //* SYSPRINT OUTPUT:    SOURCE LISTING AND DIAGNOSTIC MSGS          *\cf0 \
+\cf6 //* SYSLIN   OUTPUT:    RESULTING TEMP OBJECT MODULE                *\cf0 \
+\cf6 //*                                                                 *\cf0 \
+\cf6 //*******************************************************************\cf0 \
+\cf6 //*\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 //\cf0 STEPLIB \cf3 DD\cf0  \cf5 DSN\cf0 =IGY630.SIGYCOMP,\cf5 DISP\cf0 =SHR\
+\cf2 //\cf0         \cf3 DD\cf0  \cf5 DSN\cf0 =CEE.SCEERUN,\cf5 DISP\cf0 =SHR\
+\cf2 //\cf0         \cf3 DD\cf0  \cf5 DSN\cf0 =CEE.SCEERUN2,\cf5 DISP\cf0 =SHR\
+\pard\pardeftab720\partightenfactor0
+\cf6 //*\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 //\cf0 SYSIN   \cf3 DD\cf0  *\
+      ********************************************************\
+      *                                                      *\
+      * PROGRAM NAME: SALESRPT      			    	      *\
+      * PROGRAMMER:   Shakyla Smith-Bardney			      *\
+      * DUE DATE:     10/11/2023                             *\
+      *                                                      *\
+      * FUNCTION: THIS PROGRAM READS INPUT DATA RECORDS      *\
+      *           AND THEN WRITES THEM TO STANDARD OUTPUT.   *\
+      *                                                      *\
+      * INPUT: INDATA - THE INPUT DATA RECORDS READ IN.      *\
+      *                                                      *\
+      * OUTPUT: OUTDATA - THE INPUT DATA RECORDS WRITTEN     *\
+      *                   OUT.                               *\
+      *                                                      *\
+      * NOTES: NONE                                          *\
+      *                                                      *\
+      ********************************************************\
+\
+       IDENTIFICATION DIVISION.\
+\
+       PROGRAM-ID.    SALESRPT.\
+       AUTHOR.        Shakyla Smith-Bardney.\
+       DATE-WRITTEN.  10/11/2023.\
+       DATE-COMPILED. 10/11/2023\
+\
+       ENVIRONMENT DIVISION.\
+\
+       INPUT-OUTPUT SECTION.\
+\
+       FILE-CONTROL.\
+\
+           SELECT SALES-FILE ASSIGN TO SALESFLE.\
+           SELECT REPORT-FILE ASSIGN TO RPTFILE.\
+\
+       DATA DIVISION.\
+\
+       FILE SECTION.\
+\
+       FD   SALES-FILE\
+            RECORDING MODE F.\
+\
+       01   SALES-RECORD.\
+            05 IN-BRANCH-NME      PIC X(20).\
+            05 IN-BROKER-NME      PIC X(25).\
+            05 IN-DEP-AMT         PIC S9(8)V99.\
+            05                    PIC X(25).\
+\
+       FD   REPORT-FILE\
+            RECORDING MODE F.\
+\
+       01   REPORT-RECORD         PIC X(132).\
+\
+       WORKING-STORAGE SECTION.\
+       01   EOF-FLAG              PIC X(1)   VALUE 'N'.\
+\
+       01   DETAIL-LINE.\
+            05   OUT-BRANCH-NME   PIC X(20).\
+            05                    PIC X(15) VALUE SPACES.\
+            05   OUT-BROKER-NME   PIC X(25).\
+            05                    PIC X(15) VALUE SPACES.\
+            05   OUT-DEP-AMT      PIC $$$,$$$,$$9.99.\
+            05                    PIC X(80)  VALUE SPACES.\
+\
+       PROCEDURE DIVISION.\
+       0000-MAIN.\
+\
+           OPEN INPUT  SALES-FILE.\
+           OPEN OUTPUT REPORT-FILE.\
+\
+           PERFORM UNTIL EOF-FLAG = 'Y'\
+              READ SALES-FILE\
+                  AT END\
+                     MOVE 'Y' TO EOF-FLAG\
+                  NOT AT END\
+                     PERFORM 0100-PROCESS-RECORD\
+              END-READ\
+           END-PERFORM.\
+\
+           CLOSE SALES-FILE.\
+           CLOSE REPORT-FILE.\
+\
+            MOVE 0 TO  RETURN-CODE.\
+\
+           STOP RUN.\
+\
+       0000-EXIT. EXIT.\
+\
+       0100-PROCESS-RECORD.\
+\
+            MOVE IN-BRANCH-NME TO OUT-BRANCH-NME.\
+            MOVE IN-BROKER-NME TO OUT-BROKER-NME.\
+            MOVE IN-DEP-AMT TO OUT-DEP-AMT.\
+            WRITE REPORT-RECORD FROM DETAIL-LINE AFTER 2.\
+\
+\
+       0100-EXIT. EXIT.\
+\
+\cf4 /*\cf0 \
+\cf2 //\cf0 SYSPRINT \cf3 DD\cf0  \cf5 SYSOUT\cf0 =*\
+\pard\pardeftab720\partightenfactor0
+\cf6 //*\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 //\cf0 SYSLIN   \cf3 DD\cf0  \cf5 DSN\cf0 =&&OBJMOD,\cf5 SPACE\cf0 =(CYL,(1,1)),\
+\cf2 //\cf0             \cf5 DISP\cf0 =(MOD,PASS)\
+\pard\pardeftab720\partightenfactor0
+\cf6 //*\cf0 \
+\cf6 //********************************************************************\cf0 \
+\cf6 //*                                                                  *\cf0 \
+\cf6 //* THE FOLLOWING DATA SETS ARE REQUIRED BY COMPLIER                 *\cf0 \
+\cf6 //*                                                                  *\cf0 \
+\cf6 //********************************************************************\cf0 \
+\cf6 //*\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 //\cf0 SYSUT1   \cf3 DD\cf0  \cf5 UNIT\cf0 =SYSDA,\cf5 SPACE\cf0 =(CYL,(1,1))\
+\cf2 //\cf0 SYSUT2   \cf3 DD\cf0  \cf5 UNIT\cf0 =SYSDA,\cf5 SPACE\cf0 =(CYL,(1,1))\
+\cf2 //\cf0 SYSUT3   \cf3 DD\cf0  \cf5 UNIT\cf0 =SYSDA,\cf5 SPACE\cf0 =(CYL,(1,1))\
+\cf2 //\cf0 SYSUT4   \cf3 DD\cf0  \cf5 UNIT\cf0 =SYSDA,\cf5 SPACE\cf0 =(CYL,(1,1))\
+\cf2 //\cf0 SYSUT5   \cf3 DD\cf0  \cf5 UNIT\cf0 =SYSDA,\cf5 SPACE\cf0 =(CYL,(1,1))\
+\cf2 //\cf0 SYSUT6   \cf3 DD\cf0  \cf5 UNIT\cf0 =SYSDA,\cf5 SPACE\cf0 =(CYL,(1,1))\
+\cf2 //\cf0 SYSUT7   \cf3 DD\cf0  \cf5 UNIT\cf0 =SYSDA,\cf5 SPACE\cf0 =(CYL,(1,1))\
+\cf2 //\cf0 SYSUT8   \cf3 DD\cf0  \cf5 UNIT\cf0 =SYSDA,\cf5 SPACE\cf0 =(CYL,(1,1))\
+\cf2 //\cf0 SYSUT9   \cf3 DD\cf0  \cf5 UNIT\cf0 =SYSDA,\cf5 SPACE\cf0 =(CYL,(1,1))\
+\cf2 //\cf0 SYSUT10  \cf3 DD\cf0  \cf5 UNIT\cf0 =SYSDA,\cf5 SPACE\cf0 =(CYL,(1,1))\
+\cf2 //\cf0 SYSUT11  \cf3 DD\cf0  \cf5 UNIT\cf0 =SYSDA,\cf5 SPACE\cf0 =(CYL,(1,1))\
+\cf2 //\cf0 SYSUT12  \cf3 DD\cf0  \cf5 UNIT\cf0 =SYSDA,\cf5 SPACE\cf0 =(CYL,(1,1))\
+\cf2 //\cf0 SYSUT13  \cf3 DD\cf0  \cf5 UNIT\cf0 =SYSDA,\cf5 SPACE\cf0 =(CYL,(1,1))\
+\cf2 //\cf0 SYSUT14  \cf3 DD\cf0  \cf5 UNIT\cf0 =SYSDA,\cf5 SPACE\cf0 =(CYL,(1,1))\
+\cf2 //\cf0 SYSUT15  \cf3 DD\cf0  \cf5 UNIT\cf0 =SYSDA,\cf5 SPACE\cf0 =(CYL,(1,1))\
+\pard\pardeftab720\partightenfactor0
+\cf6 //*\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 //\cf0 SYSMDECK \cf3 DD\cf0  \cf5 UNIT\cf0 =SYSDA,\cf5 SPACE\cf0 =(CYL,(1,1))\
+\pard\pardeftab720\partightenfactor0
+\cf6 //*\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 //\cf0 STEP02   \cf3 EXEC\cf0  \cf5 PGM\cf0 =IEWBLINK,\cf5 COND\cf0 =(0,LT)\
+\pard\pardeftab720\partightenfactor0
+\cf6 //*\cf0 \
+\cf6 //*******************************************************************\cf0 \
+\cf6 //*                                                                 *\cf0 \
+\cf6 //* STEP02 CREATES A LOAD MODULE FROM INPUT OBJECT MODULE AND       *\cf0 \
+\cf6 //* STORES IT AS A PROGRAM OBJECT.                                  *\cf0 \
+\cf6 //*                                                                 *\cf0 \
+\cf6 //* SYSLIB  INPUT:      LOAD MODULE LIBRARIES NEEDED BY LOADER FOR  *\cf0 \
+\cf6 //*                     COBOL OBJECT MODULE                         *\cf0 \
+\cf6 //* SYSLIN  INPUT:      THE OBJECT MODULE                           *\cf0 \
+\cf6 //* SYSLMOD OUTPUT:     RESULTING LOAD MODULE CREATED BY BINDER     *\cf0 \
+\cf6 //*                                                                 *\cf0 \
+\cf6 //*******************************************************************\cf0 \
+\cf6 //*\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 //\cf0 SYSLIB   \cf3 DD\cf0  \cf5 DSN\cf0 =CEE.SCEELKEX,\cf5 DISP\cf0 =SHR\
+\cf2 //\cf0          \cf3 DD\cf0  \cf5 DSN\cf0 =CEE.SCEELKED,\cf5 DISP\cf0 =SHR\
+\pard\pardeftab720\partightenfactor0
+\cf6 //*\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 //\cf0 SYSLIN   \cf3 DD\cf0  \cf5 DSN\cf0 =&&OBJMOD,\cf5 DISP\cf0 =(MOD,PASS)\
+\pard\pardeftab720\partightenfactor0
+\cf6 //*\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 //\cf0 SYSPRINT \cf3 DD\cf0  \cf5 SYSOUT\cf0 =*\
+\pard\pardeftab720\partightenfactor0
+\cf6 //*\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 //\cf0 SYSLMOD  \cf3 DD\cf0  \cf5 DSN\cf0 =KC03CAD.CSCI465.LOADLIB(SALESRPT),\
+\cf2 //\cf0             \cf5 SPACE\cf0 =(1024,(50,20,1)),\cf5 DSNTYPE\cf0 =LIBRARY,\
+\cf2 //\cf0             \cf5 DISP\cf0 =(MOD,KEEP,KEEP)\
+\pard\pardeftab720\partightenfactor0
+\cf6 //*\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 //\cf0 STEP03  \cf3 EXEC\cf0  \cf5 PGM\cf0 =SALESRPT,\cf5 COND\cf0 =(0,LT)\
+\pard\pardeftab720\partightenfactor0
+\cf6 //*\cf0 \
+\cf6 //***************************************************************\cf0 \
+\cf6 //*                                                             *\cf0 \
+\cf6 //*  STEP03 THE FOLLOWING DATA SETS ARE REQUIRED BY THE COBOL   *\cf0 \
+\cf6 //*  PROGRAM TO EXECUTE THE LOAD MODULE.                        *\cf0 \
+\cf6 //*                                                             *\cf0 \
+\cf6 //*  STEPLIB   INPUT:   LOCATION OF THE PROGRAM OBJECT          *\cf0 \
+\cf6 //*  INDATA    INPUT:   INPUT FILE                              *\cf0 \
+\cf6 //*                                                             *\cf0 \
+\cf6 //*  RPTDATA   OUTPUT:  PRINT TO STANDARD OUTPUT                *\cf0 \
+\cf6 //*                                                             *\cf0 \
+\cf6 //*  SYSUDUMP  OUTPUT:  FOR A SYSTEM DUMP IF ABEND              *\cf0 \
+\cf6 //*                                                             *\cf0 \
+\cf6 //***************************************************************\cf0 \
+\cf6 //*\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 //\cf0 STEPLIB \cf3 DD\cf0  \cf5 DSN\cf0 =KC03CAD.CSCI465.LOADLIB,\cf5 DISP\cf0 =SHR\
+\pard\pardeftab720\partightenfactor0
+\cf6 //*\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 //\cf0 SALESFLE  \cf3 DD\cf0  \cf5 DSN\cf0 =KC02322.CSCI465.DATAFA23(DATA4),\cf5 DISP\cf0 =SHR\
+\pard\pardeftab720\partightenfactor0
+\cf6 //*\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 //\cf0 RPTFILE \cf3 DD\cf0  \cf5 SYSOUT\cf0 =*\
+\pard\pardeftab720\partightenfactor0
+\cf6 //*\cf0 \
+\pard\pardeftab720\partightenfactor0
+\cf2 //\cf0 SYSDUMP \cf3 DD\cf0  \cf5 SYSOUT\cf0 =*\
+\cf2 //}
