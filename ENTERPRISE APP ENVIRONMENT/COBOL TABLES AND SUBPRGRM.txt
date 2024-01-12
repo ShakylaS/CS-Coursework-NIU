@@ -1,0 +1,1074 @@
+//KC03CADA JOB ,'S. SMITH-BARDNEY',MSGCLASS=H
+//*
+//*******************************************************************
+//*                                                                 *
+//*  CSCI 465 PE1       ASSIGNMENT 7            Fall 2023           *
+//*                  COBOL Tables and Subprograms                   *
+//*                                                                 *
+//*  DEVELOPER NAME: SHAKYLA SMITH-BARDNEY                          *
+//*        DUE DATE: 12/08/2023                                     *
+//*                                                                 *
+//*  PURPOSE: This COBOL program will create 2 reports based on     *
+//*           information contained in a input file with a unknown  *
+//*           number of records.                                    *
+//*                                                                 *
+//*                                                                 *
+//*******************************************************************
+//*
+//STEP01  EXEC PGM=SORT,PARM='CMP=CLC'
+//*
+//*******************************************************************
+//*                                                                 *
+//* STEP01 - DFSORT TO SORT IN DATA                                 *
+//*                                                                 *
+//* DD NAME             FILE DESCRIPTION                            *
+//* SYSPRINT OUTPUT:    SOURCE LISTING AND DIAGNOSTIC MSGS          *
+//* SYSLIN   OUTPUT:    RESULTING TEMP OBJECT MODULE                *
+//*                                                                 *
+//*******************************************************************
+//*
+//SORTIN   DD DSN=KC02322.CSCI465.DATAFA23(FUNDS),DISP=SHR
+//SORTOUT  DD DSN=&&SORTED,SPACE=(TRK,(1,5)),DISP=(NEW,PASS)
+//*
+//SYSOUT  DD SYSOUT=*
+//*
+//SYSIN   DD *
+  SORT FIELDS=(1,3,ZD,A)
+/*
+//*
+//STEP02  EXEC PGM=IGYCRCTL,REGION=0M,COND=(0,LT)
+//*
+//*******************************************************************
+//*                                                                 *
+//* STEP02 COMPLE COBOL SOURCE CODE FOR SALESRPT.                   *
+//*                                                                 *
+//* SYSLIB  INPUT:      LOAD MODULE LIBRARIES NEEDED BY LOADER FOR  *
+//*                     COBOL OBJECT MODULE                         *
+//* SYSLIN  INPUT:      THE OBJECT MODULE                           *
+//* SYSLMOD OUTPUT:     RESULTING LOAD MODULE CREATED BY BINDER     *
+//*                                                                 *
+//*******************************************************************
+//*
+//STEPLIB DD DSN=IGY630.SIGYCOMP,DISP=SHR
+//        DD DSN=CEE.SCEERUN,DISP=SHR
+//        DD DSN=CEE.SCEERUN2,DISP=SHR
+//*
+//*
+//SYSLIB   DD DSN=KC02322.CSCI465.COPYLIB,DISP=SHR
+//*
+//SYSIN    DD *
+      ********************************************************
+      *                                                      *
+      * PROGRAM NAME: SALESRPT                               *
+      * PROGRAMMER:   Shakyla Smith-Bardney                  *
+      * DUE DATE:     12/08/2023                             *
+      *                                                      *
+      * FUNCTION: THIS PROGRAM READS INPUT DATA RECORDS      *
+      *           AND THEN WRITES THEM TO FORMATTED REPORTS. *
+      *                                                      *
+      * INPUT: THE INPUT DATA CONTAINS RECORDS OF SALES      *
+      *        TRANSACTIONS AND OTHER BROKER INFO.           *
+      *                                                      *
+      * OUTPUT: PRODUCE DETAIL AND SUMMARY LINES REGARDING   *
+      *         BROKER SALES AND TOTALS.                     *
+      *                                                      *
+      * NOTES: NONE                                          *
+      *                                                      *
+      ********************************************************
+
+       IDENTIFICATION DIVISION.
+
+       PROGRAM-ID.    SALESRPT.
+       AUTHOR.        Shakyla Smith-Bardney.
+       DATE-WRITTEN.  12/01/2023.
+       DATE-COMPILED.
+
+       ENVIRONMENT DIVISION.
+
+       INPUT-OUTPUT SECTION.
+
+       FILE-CONTROL.
+
+           SELECT FUND-FILE ASSIGN TO FUNDFILE.
+           SELECT SALE-FILE ASSIGN TO SALEFILE.
+           SELECT REPORT-FILE ASSIGN TO RPTFILE.
+           SELECT HIGH-SALE-FILE ASSIGN TO HSFILE.
+
+       DATA DIVISION.
+
+       FILE SECTION.
+
+       FD  FUND-FILE
+           RECORDING MODE IS F.
+
+           COPY FUNDREC.
+           05  FILLER                          PIC X(46) VALUE SPACES.
+
+       FD  SALE-FILE
+           RECORDING MODE F.
+
+           COPY SALESREC.
+
+       FD  HIGH-SALE-FILE
+           RECORDING MODE F.
+
+           COPY HSREC.
+
+       FD  REPORT-FILE
+           RECORDING MODE F.
+
+       01  REPORT-RECORD          PIC X(132).
+
+       WORKING-STORAGE SECTION.
+
+      ********************************************************
+      *                                                      *
+      * FIELD:            DESCRIPTION:                       *
+      * CALCULATIONS      USED TO PERFORM COMPUTATIONS       *
+      * COUNTERS          STORE COUNTERS TO PRINT TOTALS     *
+      * HEADER-LINES      USED TO FORMAT AND DISPLAY HEADERS *
+      * HYPHEN-LINE       USED TO FORMAT AND DISPLAY HYPHENS *
+      * OUT TOTALS        USED TO FORMAT AND DISPLAY OUTPUT  *
+      *                   FOR REPORTS                        *
+      * CURRENT DATE FIELDS  USED TO GET CURRENT TIME / DATE *
+      *                                                      *
+      ********************************************************
+
+       01  FUND-TBL.
+           05  TBL-FUND-CTR          PIC S9(3) BINARY SYNC VALUE 0.
+           05  TBL-FUND-ENTRY        OCCURS 1 TO 199
+                                     DEPENDING ON TBL-FUND-CTR
+                                     ASCENDING KEY TBL-FUND-NBR
+                                     INDEXED BY TBL-FUND-NDX.
+           COPY FUNDTBL.
+
+       01  EOF-FLAG             PIC X(1)   VALUE 'N'.
+
+       01  PRC-SUB              PIC S9 BINARY SYNC.
+
+       01 SUBPROGRAM            PIC X(8)   VALUE 'BUILDTBL'.
+
+       01  CALCULATIONS.
+           05  TOT-DEP-AMT      PIC S9(10)V99 PACKED-DECIMAL VALUE 0.
+           05  TOT-COMM-AMT     PIC S9(10)V99 PACKED-DECIMAL VALUE 0.
+           05  SHR-AMT          PIC S9(10)V9(4) PACKED-DECIMAL VALUE 0.
+           05  DEP-AMT          PIC S9(8)V99(2) PACKED-DECIMAL VALUE 0.
+           05  SHR-PRC          PIC S9(3)V99 PACKED-DECIMAL VALUE 0.
+           05  TOT-SHR-AMT      PIC S9(10)V9(3) PACKED-DECIMAL VALUE 0.
+           05  CALC-COMM-AMT    PIC S9(10)V99 PACKED-DECIMAL VALUE 0.
+
+       01  COUNTERS.
+           05  PAGE-CTR         PIC S9(3) VALUE 0.
+           05  LINE-CTR         PIC S9(2) BINARY SYNC VALUE 99.
+           05  SALE-CTR         PIC S9(3) VALUE 0.
+           05  BROKER-CTR      PIC 9(6) VALUE 0.
+
+       01  HEADER-LINE-1.
+           05  OUT-CURRENT-DATE.
+               10  CURRENT-MONTH  PIC 9(2).
+               10                 PIC X     VALUE '/'.
+               10  CURRENT-DAY    PIC 9(2).
+               10                 PIC X     VALUE '/'.
+               10  CURRENT-YEAR   PIC 9(4).
+           05                     PIC X(38) VALUE SPACES.
+           05    PIC X(35) VALUE ' WASHINGTON & LINCOLN INVESTMENTS  '.
+           05                     PIC X(40) VALUE SPACES.
+           05                     PIC X(6)  VALUE 'PAGE: '.
+           05  OUT-PAGE-CTR       PIC ZZ9.
+
+       01  HEADER-LINE-2.
+           05  OUT-CURRENT-TIME.
+               10  UPDATED-HOUR   PIC 9(2).
+               10                 PIC X     VALUE ':'.
+               10  UPDATED-MINUTE PIC 9(2).
+           05    AM-PM            PIC X(3).
+           05                     PIC X(37) VALUE SPACES.
+           05  REPORT-TITLE       PIC X(42).
+           05                     PIC X(28) VALUE SPACES.
+           05                     PIC X(9)  VALUE 'JOBNAME: '.
+           05  JOBNAME            PIC X(8)  VALUE 'JOBNAME'.
+
+       01  HEADER-LINE-3.
+           05                     PIC X(89) VALUE SPACES.
+           05                     PIC X(7) VALUE 'DEPOSIT'.
+           05                     PIC X(26) VALUE SPACES.
+           05                     PIC X(10) VALUE 'COMMISSION'.
+
+       01  SALES-REPORT-COLUMN-HDR.
+           05                     PIC X(11) VALUE 'BRANCH NAME'.
+           05                     PIC X(12)  VALUE SPACES.
+           05                     PIC X(11) VALUE 'BROKER NAME'.
+           05                     PIC X(15)  VALUE SPACES.
+           05                     PIC X(4)  VALUE 'FUND'.
+           05                     PIC X(2)  VALUE SPACES.
+           05                     PIC X(9)  VALUE 'FUND NAME'.
+           05                     PIC X(26)  VALUE SPACES.
+           05                     PIC X(6) VALUE 'AMOUNT'.
+           05                     PIC X(9) VALUE SPACES.
+           05                     PIC X(11) VALUE 'SHARES SOLD'.
+           05                     PIC X(10) VALUE SPACES.
+           05                     PIC X(6) VALUE 'AMOUNT'.
+
+       01  TOT-COLUMN-HDR.
+           05                     PIC X(23) VALUE SPACES.
+           05                     PIC X(7) VALUE 'BROKERS'.
+           05                     PIC X(11)  VALUE SPACES.
+           05                     PIC X(15) VALUE 'NUMBER OF SALES'.
+           05                     PIC X(26)  VALUE SPACES.
+           05                     PIC X(14) VALUE 'TOTAL DEPOSITS'.
+           05                     PIC X(19)  VALUE SPACES.
+           05                     PIC X(17) VALUE 'TOTAL COMMISSIONS'.
+
+
+       01  HYPHEN-LINE-1.
+           05  HYPHEN             PIC X(20)  VALUE ALL '-'.
+           05                     PIC X(3)  VALUE SPACES.
+           05  HYPHEN             PIC X(25)  VALUE ALL '-'.
+           05                     PIC X(1)   VALUE SPACES.
+           05  HYPHEN             PIC X(4)  VALUE ALL '-'.
+           05                     PIC X(2)   VALUE SPACES.
+           05  HYPHEN             PIC X(25)  VALUE ALL '-'.
+           05                     PIC X(1)  VALUE SPACES.
+           05  HYPHEN             PIC X(15)  VALUE ALL '-'.
+           05                     PIC X(2)   VALUE SPACES.
+           05  HYPHEN             PIC X(18)  VALUE ALL '-'.
+           05                     PIC X(1)  VALUE SPACES.
+           05  HYPHEN             PIC X(15)  VALUE ALL '-'.
+
+       01  HYPHEN-LINE-2.
+           05                     PIC X(23)  VALUE SPACES.
+           05  HYPHEN             PIC X(7)  VALUE ALL '-'.
+           05                     PIC X(11)   VALUE SPACES.
+           05  HYPHEN             PIC X(15)  VALUE ALL '-'.
+           05                     PIC X(22)   VALUE SPACES.
+           05  HYPHEN             PIC X(18)  VALUE ALL '-'.
+           05                     PIC X(18)   VALUE SPACES.
+           05  HYPHEN             PIC X(18)  VALUE ALL '-'.
+
+       01  HYPHEN-LINE-3.
+           05                     PIC X(18)  VALUE SPACES.
+           05  HYPHEN             PIC X(25)  VALUE ALL '-'.
+           05                     PIC X(11)  VALUE SPACES.
+           05  HYPHEN             PIC X(4)  VALUE ALL '-'.
+           05                     PIC X(7)  VALUE SPACES.
+           05  HYPHEN             PIC X(25)  VALUE ALL '-'.
+           05                     PIC X(8)  VALUE SPACES.
+           05  HYPHEN             PIC X(18)  VALUE ALL '-'.
+           05  HYPHEN             PIC X(16)  VALUE SPACES.
+
+
+       01  OUT-SALE-REC.
+           05  OUT-BRANCH-NME     PIC X(20).
+           05                     PIC X(3)  VALUE SPACES.
+           05  OUT-BROKER-NME     PIC X(25).
+           05                     PIC X(2)   VALUE SPACES.
+           05  OUT-FUND-NBR       PIC ZZ9.
+           05                     PIC X(2)   VALUE SPACES.
+           05  OUT-FUND-NME       PIC X(25).
+           05                     PIC X(2)   VALUE SPACES.
+           05  OUT-DEP-AMT        PIC $$$,$$$,$$9.99.
+           05                     PIC X(2)   VALUE SPACES.
+           05  OUT-SHR-SOLD       PIC Z,ZZZ,ZZZ,ZZ9.9999.
+           05                     PIC X(2)  VALUE SPACES.
+           05  OUT-COMM-AMT       PIC $$$,$$$,$$9.99.
+
+       01 OUT-SALES-REPORT-TOTALS.
+          05                      PIC X(27) VALUE SPACES.
+          05  OUT-BRKR-CTR        PIC ZZ9.
+          05                      PIC X(23) VALUE SPACES.
+          05  OUT-NUM-SALES       PIC ZZ9.
+          05                      PIC X(26) VALUE SPACES.
+          05  OUT-TOT-DEP-AMT     PIC $$$,$$$,$$9.99.
+          05                      PIC X(22) VALUE SPACES.
+          05  OUT-TOT-COMM-AMT    PIC $$$,$$$,$$9.99.
+
+       01  CURRENT-DATE-FIELDS.
+           05  CURRENT-DATE.
+               10  CURRENT-YEAR   PIC 9(4).
+               10  CURRENT-MONTH  PIC 9(2).
+               10  CURRENT-DAY    PIC 9(2).
+           05  CURRENT-TIME.
+               10  CURRENT-HOUR   PIC 9(2).
+               10  CURRENT-MINUTE PIC 9(2).
+           05  DIFF-FROM-GMT      PIC S9(4).
+
+       PROCEDURE DIVISION.
+
+       0000-MAIN.
+      ********************************************************
+      *                                                      *
+      * THIS ROUTINE CONTROLS THE FLOW AND LOGIC TO PROCESS  *
+      * THE SALES TRANSACTION FILE AND PRINT THE REPORTS     *
+      * WHICH SHOW BROKERS, TRANSACTION AMOUNTS, AND COUNT   *
+      * TOTALS                                               *
+      *                                                      *
+      ********************************************************
+
+      *     CALL 'CALCSHRS'.
+      *     CALL 'HISALES'.
+
+       01 SUBPROGRAM            PIC X(8)   VALUE 'BUILDTBL'.
+
+           PERFORM 0100-CURRENT-DATE-AND-TIME.
+
+           CALL JOBNAME USING JOBNAME.
+
+           OPEN INPUT  SALE-FILE
+                OUTPUT REPORT-FILE
+                OUTPUT HIGH-SALE-FILE.
+
+           READ SALE-FILE
+             AT END MOVE 'Y' TO EOF-FLAG
+           END-READ
+
+           IF EOF-FLAG = 'N'
+
+             PERFORM 0200-BROKER-DETAIL-LINE
+               UNTIL EOF-FLAG = 'Y'
+
+             PERFORM 0500-WRITE-SALES-REPORT-TOTALS
+
+      *       CALL 'HISALE' USING SALE-FILE
+      *                     HIGH-SALE-FILE
+
+           END-IF.
+
+
+           CLOSE SALE-FILE
+                 REPORT-FILE
+                 HIGH-SALE-FILE.
+
+
+           MOVE 0 TO  RETURN-CODE.
+
+           STOP RUN.
+
+       0000-EXIT. EXIT.
+
+       0100-CURRENT-DATE-AND-TIME.
+      ********************************************************
+      *                                                      *
+      * THIS ROUTINE MOVES DATE AND TIME TO REQUIRED FIELDS  *
+      * AND COMPUTES CURRENT HOUR BASED ON MY TIME ZONE.     *
+      *                                                      *
+      ********************************************************
+           MOVE FUNCTION CURRENT-DATE TO CURRENT-DATE-FIELDS.
+           MOVE CORRESPONDING CURRENT-DATE TO OUT-CURRENT-DATE.
+
+           COMPUTE CURRENT-HOUR = CURRENT-HOUR - 1.
+
+           IF CURRENT-HOUR = 00
+             MOVE '12' TO CURRENT-HOUR
+             MOVE ' AM' TO AM-PM
+           ELSE IF CURRENT-HOUR > 12
+             MOVE ' PM' TO AM-PM
+             COMPUTE CURRENT-HOUR = CURRENT-HOUR - 12
+           ELSE IF CURRENT-HOUR = 12
+             MOVE ' PM' TO AM-PM
+           ELSE
+             MOVE ' AM' TO AM-PM
+           END-IF.
+
+           MOVE CURRENT-HOUR TO UPDATED-HOUR.
+           MOVE CURRENT-MINUTE TO UPDATED-MINUTE.
+
+       0100-EXIT. EXIT.
+
+       0200-BROKER-DETAIL-LINE.
+      ***********************************************************
+      *                                                         *
+      * DESCRIPTION:   This routine processes the record        *
+      *                of the input file by moving values to    *
+      *                required fields and computing necessary  *
+      *                totals for reports.                      *
+      *                                                         *
+      ***********************************************************
+           ADD 1 TO BROKER-CTR.
+
+           PERFORM VARYING SALE-NDX FROM 1 BY 1
+             UNTIL SALE-NDX > 4
+             OR SALE-FUND-NBR (SALE-NDX) = 0
+
+             IF SALE-NDX = 1
+               MOVE SALE-BRANCH-NME TO OUT-BRANCH-NME
+               MOVE SALE-BROKER-NME TO OUT-BROKER-NME
+             ELSE
+               MOVE SPACES TO OUT-BRANCH-NME
+                              OUT-BROKER-NME
+             END-IF
+
+             MOVE SALE-DEP-AMT (SALE-NDX) TO DEP-AMT
+             COMPUTE TOT-DEP-AMT ROUNDED
+                   = DEP-AMT + TOT-DEP-AMT
+      *
+             MOVE SALE-DEP-AMT (SALE-NDX) TO OUT-DEP-AMT
+             MOVE SALE-FUND-NBR (SALE-NDX) TO OUT-FUND-NBR
+
+             ADD 1 TO SALE-CTR
+
+      *       IF SALE-FUND-NBR (SALE-NDX) > 0
+               SEARCH ALL TBL-FUND-ENTRY
+                 AT END PERFORM 0350-NO-MATCH
+            WHEN TBL-FUND-NBR (TBL-FUND-NDX) = SALE-FUND-NBR(SALE-NDX)
+                 PERFORM 0300-MATCH-FOUND
+               END-SEARCH
+      *       END-IF
+
+           IF LINE-CTR > 17
+             MOVE '     BROKER DAILY FUND SALES REPORT               '
+                  TO REPORT-TITLE
+             PERFORM 0400-WRITE-HEADERS
+             WRITE REPORT-RECORD FROM SALES-REPORT-COLUMN-HDR AFTER 2
+             WRITE REPORT-RECORD FROM HYPHEN-LINE-1
+           END-IF
+
+           WRITE REPORT-RECORD FROM OUT-SALE-REC AFTER 2
+           ADD 1 TO LINE-CTR
+
+           END-PERFORM.
+
+           READ SALE-FILE
+             AT END MOVE 'Y' TO EOF-FLAG
+           END-READ.
+
+       0200-EXIT. EXIT.
+
+
+       0300-MATCH-FOUND.
+      ***********************************************************
+      *                                                         *
+      * DESCRIPTION:   This routine moves values to the detail  *
+      *                line and calls 'CALCSHRS' to compute the *
+      *                shares sold and commission amount if the *
+      *                fund number is greater than 0.           *
+      *                                                         *
+      ***********************************************************
+           MOVE TBL-FUND-NME(TBL-FUND-NDX) TO OUT-FUND-NME.
+      *
+           MOVE SALE-PRC-FLG (SALE-NDX) TO PRC-SUB.
+           MOVE TBL-FUND-SHR-PRC (TBL-FUND-NDX, PRC-SUB)
+                TO SHR-PRC.
+      *
+           CALL 'CALCSHRS' USING DEP-AMT
+                                 SHR-PRC
+                                 SHR-AMT.
+
+           MOVE SHR-AMT TO OUT-SHR-SOLD.
+
+
+           COMPUTE CALC-COMM-AMT ROUNDED
+           = SALE-DEP-AMT(SALE-NDX) * (TBL-FUND-COMM-PCT (TBL-FUND-NDX)
+            / 100 )
+           MOVE CALC-COMM-AMT TO OUT-COMM-AMT.
+
+           COMPUTE TOT-COMM-AMT
+               = CALC-COMM-AMT + TOT-COMM-AMT.
+
+       0300-EXIT. EXIT.
+
+       0350-NO-MATCH.
+      ********************************************************
+      *                                                      *
+      * THIS ROUTINE FORMATS AND DISPLAYS HEADERS. SETS      *
+      * COUNTER VALUES.                                      *
+      *                                                      *
+      ********************************************************
+           MOVE '** SALE FUND NOT FOUND **' TO OUT-FUND-NME.
+           MOVE '0' TO OUT-SHR-SOLD, OUT-COMM-AMT.
+
+       0350-EXIT. EXIT.
+
+       0400-WRITE-HEADERS.
+      ********************************************************
+      *                                                      *
+      * THIS ROUTINE FORMATS AND DISPLAYS HEADERS. SETS      *
+      * COUNTER VALUES.                                      *
+      *                                                      *
+      ********************************************************
+           ADD 1 TO PAGE-CTR.
+           MOVE PAGE-CTR TO OUT-PAGE-CTR.
+
+           WRITE REPORT-RECORD FROM HEADER-LINE-1 AFTER PAGE.
+
+           WRITE REPORT-RECORD FROM HEADER-LINE-2 AFTER 1.
+           WRITE REPORT-RECORD FROM HEADER-LINE-3 AFTER 2.
+
+           MOVE 0 TO LINE-CTR.
+
+       0400-EXIT. EXIT.
+
+       0500-WRITE-SALES-REPORT-TOTALS.
+      ********************************************************
+      *                                                      *
+      * THIS ROUTINE MOVES REPORT VALUES TO REQUIRED FIELDS  *
+      * FOR SALES REPORT OUTPUT FILE. WRITES HEADERS AND     *
+      * REPORT TOTALS TO OUTPUT FILE.                        *
+      *                                                      *
+      ********************************************************
+           MOVE BROKER-CTR TO OUT-BRKR-CTR.
+           MOVE SALE-CTR TO OUT-NUM-SALES.
+
+           MOVE TOT-DEP-AMT TO OUT-TOT-DEP-AMT.
+
+           MOVE TOT-COMM-AMT TO OUT-TOT-COMM-AMT.
+
+           IF LINE-CTR > 17
+             MOVE '     BROKER DAILY FUND SALES REPORT TOTALS        '
+                  TO REPORT-TITLE
+             PERFORM 0400-WRITE-HEADERS
+
+           END-IF
+
+           WRITE REPORT-RECORD FROM TOT-COLUMN-HDR AFTER 2.
+           WRITE REPORT-RECORD FROM HYPHEN-LINE-2 AFTER 1.
+
+           WRITE REPORT-RECORD FROM OUT-SALES-REPORT-TOTALS AFTER 2.
+
+       0500-EXIT. EXIT.
+
+//*
+//SYSLIN   DD DSN=&&OBJMOD1,SPACE=(CYL,(1,1)),
+//            DISP=(MOD,PASS)
+//*
+//SYSPRINT DD SYSOUT=*
+//*
+//********************************************************************
+//*                                                                  *
+//* THE FOLLOWING DATA SETS ARE REQUIRED BY COMPLIER                 *
+//*                                                                  *
+//********************************************************************
+//*
+//SYSUT1   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT2   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT3   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT4   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT5   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT6   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT7   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT8   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT9   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT10  DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT11  DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT12  DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT13  DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT14  DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT15  DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//*
+//SYSMDECK DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//*
+//STEP03  EXEC PGM=ASMA90,PARM=ASA,COND=(0,LT)
+//*
+//***************************************************************
+//*                                                             *
+//*  STEP03 ASSEMBLER FOR CALC SHARES                           *
+//*                                                             *
+//*  STEPLIB   INPUT:   LOCATION OF THE PROGRAM OBJECT          *
+//*  INDATA    INPUT:   INPUT FILE                              *
+//*                                                             *
+//*  RPTDATA   OUTPUT:  PRINT TO STANDARD OUTPUT                *
+//*                                                             *
+//*  SYSUDUMP  OUTPUT:  FOR A SYSTEM DUMP IF ABEND              *
+//*                                                             *
+//***************************************************************
+//*
+//SYSLIB   DD DSN=SYS1.MACLIB,DISP=SHR
+//*
+//SYSIN    DD *
+***************************************************************
+*                                                             *
+* PROGRAM:    CALCSHRS                                        *
+*                                                             *
+* DESCRIPTION:   This program calculates the shares sold      *
+*                amounts based on the deposit amount and      *
+*                share price.                                 *
+***************************************************************
+         PRINT  NOGEN                MACRO CALL SUPPRESSION
+CALCSHRS CSECT
+* STANDARD ENTRY LINKAGE
+         STM   14,12,12(13)          SAVE CALLER'S REGS
+         LR    12,15                 SET R12 TO R15
+         USING CALCSHRS,12           ESTABLISH R12 AS 1ST BASE REG
+         LA    14,REGS               R14 -> CURRENT SAVE AREA
+         ST    13,4(,14)             SAVE CALLER'S SAVE AREA ADDR
+         ST    14,8(,14)             SAVE CURRENT SAVE AREA ADDR
+         LR    13,14                 R13 -> CURRENT SAVE AREA
+*
+* LOAD REGISTERS
+         LM    2,4,0(1)              LOAD FROM PARM LIST TO REG 2-5
+         ZAP   DEPAMT(11),0(6,2)     LOAD REG 2 WITH DEP AMT
+         ZAP   SHRPRC(3),0(3,3)      LOAD REG 3 WITH SHRPRC
+*
+* CALCULATE SHARES SOLD
+         ZAP   SHRAMT(11),DEPAMT(11) SET CALC AMT TO SHARES SOLD
+         SRP   SHRAMT(11),3,0        SHIFT SHARES SOLD
+         DP    SHRAMT(11),SHRPRC(3)  CALC SHARES SOLD
+         ZAP   0(8,4),SHRAMT(8)      SET AMOUNT TO REG TO RETURN
+* EXIT LINKAGE:
+*         SR    15,15                 SET RC TO 0
+         L     13,4(,13)             R13 -> CALLER'S SAVE AREA
+         L     14,12(,13)            RESTORE R14
+         LM    0,12,20(13)           RESTORE R0 THROUGH R12
+*
+         BR    14                    RETURN TO CALLER
+*
+         LTORG                       LTORG TO ORGANIZE LITERALS
+*
+         ORG   CALCSHRS+((*-CALCSHRS+31)/32)*32
+         DC    C'HERE IS THE STORAGE FOR CALCSHRS'
+*
+* Define input parameters
+REGS     DC    18F'0'                MAINREGS FOR STANDARD LINKAGE
+*
+DEPAMT   DC    PL11'0'               Deposit amount
+SHRPRC   DC    PL3'0'                Share PRICE
+SHRAMT   DC    PL8'0'               CALCULATIONS AREA
+*
+         END   CALCSHRS
+//*
+//SYSLIN   DD DSN=&&OBJMOD2,SPACE=(CYL,(1,1)),
+//            DISP=(MOD,PASS,DELETE)
+//*
+//SYSUT1   DD SPACE=(CYL,(1,1))
+//*
+//SYSPRINT DD SYSOUT=*
+//*
+//STEP04   EXEC PGM=IGYCRCTL,REGION=0M
+//*
+//***************************************************************
+//*                                                             *
+//*  STEP04 COBOL COMPILER FOR HIGH SALES REPORT                *
+//*                                                             *
+//*  STEPLIB   INPUT:   LOCATION OF THE PROGRAM OBJECT          *
+//*  INDATA    INPUT:   INPUT FILE                              *
+//*                                                             *
+//*  RPTFILE   OUTPUT:  PRINT TO STANDARD OUTPUT                *
+//*                                                             *
+//*  SYSUDUMP  OUTPUT:  FOR A SYSTEM DUMP IF ABEND              *
+//*                                                             *
+//***************************************************************
+//*
+//STEPLIB DD DSN=IGY630.SIGYCOMP,DISP=SHR
+//        DD DSN=CEE.SCEERUN,DISP=SHR
+//        DD DSN=CEE.SCEERUN2,DISP=SHR
+//*
+//SYSLIB   DD DSN=KC02322.CSCI465.COPYLIB,DISP=SHR
+//*
+//*
+//SYSIN    DD *
+      ***********************************************************
+      *                                                         *
+      * PROGRAM:    COBOL HIGH SALES                            *
+      *                                                         *
+      * DESCRIPTION: This report details the high fund sales    *
+      *              per broker. It includes the broker name,   *
+      *              fund, fund name, and shares sold.          *
+      *                                                         *
+      ***********************************************************
+
+       IDENTIFICATION DIVISION.
+
+       PROGRAM-ID.    HISALES.
+       AUTHOR.        Shakyla Smith-Bardney.
+       DATE-WRITTEN.  12/09/2023.
+       DATE-COMPILED.
+
+       ENVIRONMENT DIVISION.
+
+       INPUT-OUTPUT SECTION.
+
+       FILE-CONTROL.
+           SELECT HIGH-SALE-FILE ASSIGN TO HSFILE.
+
+       DATA DIVISION.
+
+       FILE SECTION.
+
+       FD  HIGH-SALE-FILE
+           RECORDING MODE IS F.
+
+       COPY HSREC.
+
+       WORKING-STORAGE SECTION.
+       01  EOF-FLAG2               PIC X VALUE 'N'.
+
+       01  LINE-CTR         PIC S9(2) BINARY SYNC VALUE 99.
+
+       01  COUNTERS.
+           05  LINE-CTR2         PIC S9(2) BINARY SYNC VALUE 99.
+           05  SALE-CTR2         PIC S9(3) VALUE 0.
+
+
+
+       01  HS-COLUMN-HDR.
+           05              PIC X(18) VALUE SPACES.
+           05              PIC X(11) VALUE 'BROKER NAME'.
+           05              PIC X(25) VALUE SPACES.
+           05              PIC X(4) VALUE 'FUND'.
+           05              PIC X(7) VALUE SPACES.
+           05              PIC X(9) VALUE 'FUND NAME'.
+           05              PIC X(31) VALUE 'FUND'.
+           05              PIC X(11) VALUE 'SHARES SOLD'.
+           05              PIC X(16) VALUE 'FUND NAME'.
+
+       01 OUT-HS-REPORT.
+          05                      PIC X(37) VALUE SPACES.
+          05 OUT-HS-BROKER-NME    PIC X(25).
+          05                      PIC X(19) VALUE SPACES.
+          05 OUT-HS-SHR-AMT       PIC Z,ZZZ,ZZ9.9999.
+          05                      PIC X(37) VALUE SPACES.
+
+       LINKAGE SECTION.
+
+       01  FUND-TBL.
+           05  TBL-FUND-CTR          PIC S9(3) BINARY SYNC.
+           05  TBL-FUND-ENTRY        OCCURS 1 TO 199
+                                     DEPENDING ON TBL-FUND-CTR
+                                     ASCENDING KEY TBL-FUND-NBR
+                                     INDEXED BY TBL-FUND-NDX.
+       COPY FUNDTBL.
+
+       PROCEDURE DIVISION USING FUND-TBL.
+
+       0000-MAIN.
+
+           OPEN OUTPUT HIGH-SALE-FILE.
+
+             PERFORM 0600-WRITE-HS-REPORT
+               UNTIL EOF-FLAG2 = 'Y'
+
+           CLOSE HIGH-SALE-FILE.
+
+           MOVE 0 TO  RETURN-CODE.
+
+           GOBACK.
+
+       0000-EXIT. EXIT.
+
+       0600-WRITE-HS-REPORT.
+      **********************************************************
+      *                                                        *
+      * DESCRIPTION:   This routine moves report values to     *
+      *                required fields for high sales output   *
+      *                file. It writes headers and report      *
+      *                values to the output file.              *
+      *                                                        *
+      **********************************************************
+
+      *     IF LINE-CTR2 > 17
+      *       MOVE '       BROKER BROKER HIGH FUND SALES REPORT      '
+      *            TO REPORT-TITLE
+      *       PERFORM 0400-WRITE-HEADERS
+      *     WRITE HIGH-SALES-RECORD FROM HS-COLUMN-HDR AFTER 2
+      *     WRITE HIGH-SALES-RECORD FROM HYPHEN-LINE-3
+      *     END-IF.
+
+      *     MOVE HS-BROKER-NME TO OUT-HS-BROKER-NME.
+      *      COMPUTE TOT-SHR-AMT ROUNDED
+      *          = TOT-SHR-AMT + HS-SHR-AMT.
+      *
+      *     MOVE HS-SHR-AMT TO OUT-HS-SHR-AMT.
+      *
+      *     WRITE HIGH-SALES-RECORD AFTER 2
+
+       0600-EXIT. EXIT.
+
+//*
+//SYSPRINT DD SYSOUT=*
+//*
+//SYSLIN   DD DSN=&&OBJMOD3,SPACE=(CYL,(1,1)),
+//            DISP=(MOD,PASS,DELETE)
+//*
+//********************************************************************
+//*                                                                  *
+//* THE FOLLOWING DATA SETS ARE REQUIRED BY COMPLIER                 *
+//*                                                                  *
+//********************************************************************
+//*
+//SYSUT1   DD SPACE=(CYL,(1,1))
+//SYSUT2   DD SPACE=(CYL,(1,1))
+//SYSUT3   DD SPACE=(CYL,(1,1))
+//SYSUT4   DD SPACE=(CYL,(1,1))
+//SYSUT5   DD SPACE=(CYL,(1,1))
+//SYSUT6   DD SPACE=(CYL,(1,1))
+//SYSUT7   DD SPACE=(CYL,(1,1))
+//SYSUT8   DD SPACE=(CYL,(1,1))
+//SYSUT9   DD SPACE=(CYL,(1,1))
+//SYSUT10  DD SPACE=(CYL,(1,1))
+//SYSUT11  DD SPACE=(CYL,(1,1))
+//SYSUT12  DD SPACE=(CYL,(1,1))
+//SYSUT13  DD SPACE=(CYL,(1,1))
+//SYSUT14  DD SPACE=(CYL,(1,1))
+//SYSUT15  DD SPACE=(CYL,(1,1))
+//*
+//SYSMDECK DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//*
+//STEP05  EXEC PGM=HEWL,COND=(0,LT)
+//*
+//***************************************************************
+//*                                                             *
+//*  STEP05 BINDER FOR THE 3 OBJ MOD                            *
+//*                                                             *
+//*  STEPLIB   INPUT:   LOCATION OF THE PROGRAM OBJECT          *
+//*  INDATA    INPUT:   INPUT FILE                              *
+//*                                                             *
+//*  RPTDATA   OUTPUT:  PRINT TO STANDARD OUTPUT                *
+//*                                                             *
+//*  SYSUDUMP  OUTPUT:  FOR A SYSTEM DUMP IF ABEND              *
+//*                                                             *
+//***************************************************************
+//*
+//*
+//SYSLIB   DD DSN=CEE.SCEELKEX,DISP=SHR
+//         DD DSN=CEE.SCEELKED,DISP=SHR
+//*
+//SYSLIN   DD DSN=&&OBJMOD1,DISP=(OLD,DELETE,DELETE)
+//         DD DSN=&&OBJMOD2,DISP=(OLD,DELETE,DELETE)
+//         DD DSN=&&OBJMOD3,DISP=(OLD,DELETE,DELETE)
+//         DD *
+   ENTRY SALESRPT
+   MODE AMODE(24)
+/*
+//*
+//SYSLMOD  DD DSN=KC03CAD.CSCI465.LOADLIB(SALESRPT),
+//            SPACE=(1024,(50,20,1)),DSNTYPE=LIBRARY,
+//            DISP=(MOD,KEEP,KEEP)
+//*
+//SYSPRINT DD SYSOUT=*
+//*
+//STEP06  EXEC PGM=IGYCRCTL,COND=(0,LT),REGION=0M
+//*
+//***************************************************************
+//*                                                             *
+//*  STEP06 COBOL COMPILER FOR BUILDTBL                         *
+//*                                                             *
+//*  STEPLIB   INPUT:   LOCATION OF THE PROGRAM OBJECT          *
+//*  INDATA    INPUT:   INPUT FILE                              *
+//*                                                             *
+//*  RPTDATA   OUTPUT:  PRINT TO STANDARD OUTPUT                *
+//*                                                             *
+//*  SYSUDUMP  OUTPUT:  FOR A SYSTEM DUMP IF ABEND              *
+//*                                                             *
+//***************************************************************
+//*
+//SYSLIB   DD DSN=KC02322.CSCI465.COPYLIB,DISP=SHR
+//*
+//STEPLIB  DD DSN=IGY630.SIGYCOMP,DISP=SHR
+//*
+//SYSIN    DD *
+      ***********************************************************
+      *                                                         *
+      * SUBPROGRAM:    BUILD TBL                                *
+      *                                                         *
+      * DESCRIPTION:   This subprogram builds a table of funds  *
+      *                and their prices from input files.       *
+      *                                                         *
+      * INPUT:         FUND-FILE, PRICE-FILE                    *
+      *                                                         *
+      * OUTPUT:        FUND-TBL                                 *
+      ***********************************************************
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID.    BUILDTBL.
+       AUTHOR.        SHAKYLA SMITH.
+       DATE-WRITTEN.  12/05/2023.
+       DATE-COMPILED.
+
+       ENVIRONMENT DIVISION.
+
+       INPUT-OUTPUT SECTION.
+
+       FILE-CONTROL.
+            SELECT FUND-FILE ASSIGN TO FUNDFILE.
+            SELECT PRICE-FILE ASSIGN TO PRCFILE.
+
+       DATA DIVISION.
+
+       FILE SECTION.
+
+       FD  FUND-FILE
+           RECORDING MODE IS F.
+
+           COPY FUNDREC.
+           05  FILLER                          PIC X(46) VALUE SPACES.
+
+       FD  PRICE-FILE
+           RECORDING MODE IS F.
+
+           COPY PRCREC.
+
+       WORKING-STORAGE SECTION.
+
+       01  EOF-FLAG                  PIC X VALUE 'N'.
+
+       01  PRC-SUB                   PIC S9 BINARY SYNC.
+
+       LINKAGE SECTION.
+
+       01  FUND-TBL.
+           05  TBL-FUND-CTR          PIC S9(3) BINARY SYNC.
+           05  TBL-FUND-ENTRY        OCCURS 1 TO 199
+                                     DEPENDING ON TBL-FUND-CTR
+                                     ASCENDING KEY TBL-FUND-NBR
+                                     INDEXED BY TBL-FUND-NDX.
+           COPY FUNDTBL.
+
+       PROCEDURE DIVISION USING FUND-TBL.
+
+       0000-MAIN.
+
+           OPEN INPUT FUND-FILE.
+
+           READ FUND-FILE
+             AT END MOVE 'Y' TO EOF-FLAG
+           END-READ.
+
+           PERFORM 0100-LOAD-FUND-TBL VARYING TBL-FUND-NDX
+             FROM 1 BY 1 UNTIL TBL-FUND-NDX > 199
+                            OR EOF-FLAG = 'Y'.
+
+           CLOSE FUND-FILE.
+
+           MOVE 'N' TO EOF-FLAG.
+
+           OPEN INPUT PRICE-FILE.
+
+           READ PRICE-FILE
+             AT END MOVE 'Y' TO EOF-FLAG
+           END-READ.
+
+           PERFORM 0200-LOAD-PRICEFLE VARYING TBL-FUND-NDX
+              FROM 1 BY 1 UNTIL TBL-FUND-NDX > 199
+                             OR EOF-FLAG = 'Y'.
+
+           CLOSE PRICE-FILE.
+
+           MOVE 0 TO  RETURN-CODE.
+
+           GOBACK.
+
+       0000-EXIT. EXIT.
+
+       0100-LOAD-FUND-TBL.
+      ********************************************************
+      *                                                      *
+      * THIS ROUTINE PROCESSES FIRST RECORD OF INPUT FILE    *
+      * AND MOVES VALUES TO REQUIRED FIELD.                  *
+      *                                                      *
+      ********************************************************
+
+           ADD 1 TO TBL-FUND-CTR.
+
+           MOVE IN-FUND-NBR TO TBL-FUND-NBR (TBL-FUND-NDX).
+           MOVE IN-FUND-NME TO TBL-FUND-NME (TBL-FUND-NDX).
+
+           MOVE IN-FUND-COMM-PCT TO TBL-FUND-COMM-PCT (TBL-FUND-NDX).
+
+           READ FUND-FILE
+             AT END MOVE 'Y' TO EOF-FLAG
+           END-READ.
+
+       0100-EXIT. EXIT.
+
+       0200-LOAD-PRICEFLE.
+      ********************************************************
+      *                                                      *
+      * THIS ROUTINE FILLS SECOND DIMENSION OF FUND-TBL      *
+      *                                                      *
+      ********************************************************
+
+           MOVE 1 TO PRC-SUB.
+
+           PERFORM VARYING TBL-PRC-NDX FROM 1 BY 1
+             UNTIL TBL-PRC-NDX > 4
+             MOVE IN-FUND-SHR-PRC (PRC-SUB)
+               TO TBL-FUND-SHR-PRC (TBL-FUND-NDX, TBL-PRC-NDX)
+             ADD 1 TO PRC-SUB
+           END-PERFORM.
+
+           READ PRICE-FILE
+             AT END MOVE 'Y' TO EOF-FLAG
+           END-READ.
+
+       0200-EXIT. EXIT.
+
+//*
+//SYSLIN   DD DSN=&&OBJMOD4,SPACE=(CYL,(1,1)),
+//            DISP=(MOD,PASS,DELETE)
+//*
+//SYSUT1   DD SPACE=(CYL,(1,1))
+//SYSUT2   DD SPACE=(CYL,(1,1))
+//SYSUT3   DD SPACE=(CYL,(1,1))
+//SYSUT4   DD SPACE=(CYL,(1,1))
+//SYSUT5   DD SPACE=(CYL,(1,1))
+//SYSUT6   DD SPACE=(CYL,(1,1))
+//SYSUT7   DD SPACE=(CYL,(1,1))
+//SYSUT8   DD SPACE=(CYL,(1,1))
+//SYSUT9   DD SPACE=(CYL,(1,1))
+//SYSUT10  DD SPACE=(CYL,(1,1))
+//SYSUT11  DD SPACE=(CYL,(1,1))
+//SYSUT12  DD SPACE=(CYL,(1,1))
+//SYSUT13  DD SPACE=(CYL,(1,1))
+//SYSUT14  DD SPACE=(CYL,(1,1))
+//SYSUT15  DD SPACE=(CYL,(1,1))
+//*
+//SYSMDECK DD SPACE=(CYL,(1,1))
+//*
+//SYSPRINT DD SYSOUT=*
+//*
+//STEP07  EXEC PGM=HEWL,COND=(0,LT)
+//*
+//***************************************************************
+//*                                                             *
+//*  STEP07 BINDER FOR BUILD TBL                                *
+//*                                                             *
+//*  STEPLIB   INPUT:   LOCATION OF THE PROGRAM OBJECT          *
+//*  INDATA    INPUT:   INPUT FILE                              *
+//*                                                             *
+//*  RPTDATA   OUTPUT:  PRINT TO STANDARD OUTPUT                *
+//*                                                             *
+//*  SYSUDUMP  OUTPUT:  FOR A SYSTEM DUMP IF ABEND              *
+//*                                                             *
+//***************************************************************
+//*
+//SYSLIB   DD DSN=CEE.SCEELKED,DISP=SHR
+//*
+//SYSLIN   DD DSN=&&OBJMOD4,DISP=(OLD,DELETE,DELETE)
+//*
+//SYSLMOD  DD DSN=KC03CAD.CSCI465.LOADLIB(BUILDTBL),
+//            SPACE=(1024,(50,20,1)),DSNTYPE=LIBRARY,
+//            DISP=(MOD,KEEP,KEEP)
+//*
+//SYSPRINT DD SYSOUT=*
+//*
+//STEP08   EXEC PGM=SALESRPT,COND=(0,LT)
+//*
+//***************************************************************
+//*                                                             *
+//*  STEP08 FETCH AND EXECUTE  SALESRPT                         *
+//*                                                             *
+//*  STEPLIB   INPUT:   LOCATION OF THE PROGRAM OBJECT          *
+//*  INDATA    INPUT:   INPUT FILE                              *
+//*                                                             *
+//*  RPTDATA   OUTPUT:  PRINT TO STANDARD OUTPUT                *
+//*                                                             *
+//*  SYSUDUMP  OUTPUT:  FOR A SYSTEM DUMP IF ABEND              *
+//*                                                             *
+//***************************************************************
+//*
+//STEPLIB  DD DSN=KC03CAD.CSCI465.LOADLIB,DISP=SHR
+//         DD DSN=KC02322.CSCI465.LOADLIB,DISP=SHR
+//*
+//SALEFILE DD DSN=KC02322.CSCI465.DATA7(SALES),DISP=SHR
+//*
+//FUNDFILE DD DSN=&&SORTED,SPACE=(TRK,(1,5)),
+//            DISP=(OLD,DELETE,DELETE)
+//*
+//PRCFILE  DD DSN=KC02322.CSCI465.DATAFA23(PRICES),DISP=SHR
+//*
+//HSFILE   DD SPACE=(TRK,(1,1))
+//*
+//RPTFILE  DD SYSOUT=*
+//*
+//SYSLOUT  DD SYSOUT=*
+//*
+//SYSUDUMP DD SYSOUT=*
+//
