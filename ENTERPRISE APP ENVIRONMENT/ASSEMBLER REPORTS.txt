@@ -1,0 +1,1384 @@
+
+                   J E S 2  J O B  L O G  --  S Y S T E M  8 5 6 1  --  N O D E  S V S C J E S 2        
+
+ 
+00.53.25 JOB07971 ---- THURSDAY,  30 NOV 2023 ----
+00.53.25 JOB07971  IRR010I  USERID KC03CAD  IS ASSIGNED TO THIS JOB.
+00.53.26 JOB07971  ICH70001I KC03CAD  LAST ACCESS AT 00:49:17 ON THURSDAY, NOVEMBER 30, 2023
+00.53.26 JOB07971  $HASP373 KC03CADA STARTED - INIT 2    - CLASS A        - SYS 8561
+00.53.26 JOB07971  -                                      -----TIMINGS (MINS.)------                          -----PAGING COUNTS----
+00.53.26 JOB07971  -STEPNAME PROCSTEP    RC   EXCP   CONN       TCB       SRB  CLOCK          SERV  WORKLOAD  PAGE  SWAP   VIO SWAPS
+00.53.26 JOB07971  -STEP01               00    135     17       .00       .00     .0            18  BATCH        0     0     0     0
+00.53.27 JOB07971  -STEP02               00     59      3       .00       .00     .0             5  BATCH        0     0     0     0
+00.53.27 JOB07971  -STEP03               00     42      3       .00       .00     .0             2  BATCH        0     0     0     0
+00.53.27 JOB07971  -KC03CADA ENDED.  NAME-S. SMITH-BARDNEY     TOTAL TCB CPU TIME=      .00 TOTAL ELAPSED TIME=    .0
+00.53.27 JOB07971  $HASP395 KC03CADA ENDED - RC=0000
+
+------ JES2 JOB STATISTICS ------
+
+
+  30 NOV 2023 JOB EXECUTION DATE
+
+
+          518 CARDS READ
+
+
+        1,177 SYSOUT PRINT RECORDS
+
+
+            0 SYSOUT PUNCH RECORDS
+
+
+           93 SYSOUT SPOOL KBYTES
+
+
+         0.03 MINUTES EXECUTION TIME
+       1 //KC03CADA JOB ,'S. SMITH-BARDNEY',MSGCLASS=H                           JOB07971
+         //*                                                                             
+         //*******************************************************************           
+         //*                                                                 *           
+         //*  CSCI 465 PE1       ASSIGNMENT 6            Fall 2023           *           
+         //*                          ASSEMBLER                              *           
+         //*                                                                 *           
+         //*  DEVELOPER NAME: SHAKYLA SMITH-BARDNEY                          *           
+         //*        DUE DATE: 11/17/2023                                     *           
+         //*                                                                 *           
+         //*  PURPOSE: This Assembler program will create 2 reports based on *           
+         //*           information contained in a input file with a unknown  *           
+         //*           number of records.                                    *           
+         //*                                                                 *           
+         //*                                                                 *           
+         //*******************************************************************           
+         //*                                                                             
+       2 //STEP01 EXEC PGM=ASMA90,PARM=ASA                                               
+         //*                                                                             
+         //*******************************************************************           
+         //*                                                                 *           
+         //* STEP01 COMPILES THE ASSEMBLER SOURCE CODE USING THE CURRENT     *           
+         //* ASSEMBLER COMPILER.                                             *           
+         //*                                                                 *           
+         //* DD NAME             FILE DESCRIPTION                            *           
+         //* SYSPRINT OUTPUT:    SOURCE LISTING AND DIAGNOSTIC MSGS          *           
+         //* SYSLIN   OUTPUT:    RESULTING TEMP OBJECT MODULE                *           
+         //*                                                                 *           
+         //*******************************************************************           
+         //*                                                                             
+       3 //SYSLIB DD DSN=SYS1.MACLIB,DISP=SHR                                            
+         //*                                                                             
+       4 //SYSIN  DD *                                                                   
+         //*                                                                             
+       5 //SYSLIN   DD DSN=&&OBJMOD2,SPACE=(3040,(40,40),,,ROUND),                       
+         //            DISP=(MOD,PASS)                                                   
+         //*                                                                             
+       6 //SYSUT1   DD SPACE=(16384,(120,120),,,ROUND)                                   
+         //*                                                                             
+       7 //SYSPRINT DD SYSOUT=*                                                          
+         //*                                                                             
+       8 //STEP02   EXEC PGM=HEWL,COND=(0,LT)                                            
+         //*                                                                             
+         //*******************************************************************           
+         //*                                                                 *           
+         //* STEP02 CREATES A LOAD MODULE FROM INPUT OBJECT MODULE AND       *           
+         //* STORES IT AS A PROGRAM OBJECT.                                  *           
+         //*                                                                 *           
+         //* SYSLIB  INPUT:      LOAD MODULE LIBRARIES NEEDED BY LOADER FOR  *           
+         //*                     COBOL OBJECT MODULE                         *           
+         //* SYSLIN  INPUT:      THE OBJECT MODULE                           *           
+         //* SYSLMOD OUTPUT:     RESULTING LOAD MODULE CREATED BY BINDER     *           
+         //*                                                                 *           
+         //*******************************************************************           
+         //*                                                                             
+       9 //SYSLIB   DD DSN=CEE.SCEELKED,DISP=SHR                                         
+      10 //         DD DSN=CEE.SCEELKED,DISP=SHR                                         
+         //*                                                                             
+      11 //SYSLIN   DD DSN=&&OBJMOD2,DISP=(OLD,DELETE)                                   
+         //*                                                                             
+      12 //SYSLMOD  DD DSN=KC03CAD.CSCI465.LOADLIB(SALESRPT),                            
+         //            SPACE=(1024,(50,20,1)),DSNTYPE=LIBRARY,                           
+         //            DISP=(MOD,KEEP,KEEP)                                              
+         //*                                                                             
+      13 //SYSPRINT DD SYSOUT=*                                                          
+         //*                                                                             
+      14 //STEP03  EXEC PGM=SALESRPT,COND=(0,LT)                                         
+         //*                                                                             
+         //***************************************************************               
+         //*                                                             *               
+         //*  STEP03 THE FOLLOWING DATA SETS ARE REQUIRED BY THE         *               
+         //*  ASSEMBLER PROGRAM TO EXECUTE THE LOAD MODULE.              *               
+         //*                                                             *               
+         //*  STEPLIB   INPUT:   LOCATION OF THE PROGRAM OBJECT          *               
+         //*  INDATA    INPUT:   INPUT FILE                              *               
+         //*                                                             *               
+         //*  RPTDATA   OUTPUT:  PRINT TO STANDARD OUTPUT                *               
+         //*                                                             *               
+         //*  SYSUDUMP  OUTPUT:  FOR A SYSTEM DUMP IF ABEND              *               
+         //*                                                             *               
+         //***************************************************************               
+         //*                                                                             
+      15 //STEPLIB  DD DSN=KC03CAD.CSCI465.LOADLIB,DISP=SHR                              
+      16 //         DD DSN=KC02322.CSCI465.LOADLIB,DISP=SHR                              
+         //*                                                                             
+      17 //SALEFILE DD DSN=KC02322.CSCI465.DATAFA23(DATA6),DISP=SHR                      
+         //*                                                                             
+      18 //HSFILE   DD SPACE=(TRK,(1,1))                                                 
+         //*                                                                             
+      19 //RPTFILE  DD SYSOUT=*                                                          
+         //*                                                                             
+      20 //SYSDUMP  DD SYSOUT=*                                                          
+      21 //                                                                              
+ICH70001I KC03CAD  LAST ACCESS AT 00:49:17 ON THURSDAY, NOVEMBER 30, 2023
+IEFA111I KC03CADA IS USING THE FOLLOWING JOB RELATED SETTINGS:
+         SWA=ABOVE,TIOT SIZE=32K,DSENQSHR=DISALLOW,GDGBIAS=JOB
+IEF236I ALLOC. FOR KC03CADA STEP01
+IEF237I 1001 ALLOCATED TO SYSLIB
+IEF237I JES2 ALLOCATED TO SYSIN
+IGD101I SMS ALLOCATED TO DDNAME (SYSLIN  )
+        DSN (SYS23334.T005325.RA000.KC03CADA.OBJMOD2.H01 )
+        STORCLAS (TEMPSC) MGMTCLAS (        ) DATACLAS (        )
+        VOL SER NOS= KCTR01                                                                
+IGD101I SMS ALLOCATED TO DDNAME (SYSUT1  )
+        DSN (SYS23334.T005325.RA000.KC03CADA.R0171090    )
+        STORCLAS (TEMPSC) MGMTCLAS (        ) DATACLAS (        )
+        VOL SER NOS= KCTR01                                                                
+IEF237I JES2 ALLOCATED TO SYSPRINT
+IEF142I KC03CADA STEP01 - STEP WAS EXECUTED - COND CODE 0000
+IEF285I   SYS1.MACLIB                                  KEPT          
+IEF285I   VOL SER NOS= VTMVSC.                            
+IEF285I   KC03CAD.KC03CADA.JOB07971.D0000101.?         SYSIN         
+IGD106I SYS23334.T005325.RA000.KC03CADA.OBJMOD2.H01  PASSED,    DDNAME=SYSLIN  
+IGD105I SYS23334.T005325.RA000.KC03CADA.R0171090     DELETED,   DDNAME=SYSUT1  
+IEF285I   KC03CAD.KC03CADA.JOB07971.D0000102.?         SYSOUT        
+IEF373I STEP/STEP01  /START 2023334.0053
+IEF032I STEP/STEP01  /STOP  2023334.0053 
+        CPU:     0 HR  00 MIN  00.01 SEC    SRB:     0 HR  00 MIN  00.00 SEC    
+        VIRT:   208K  SYS:   252K  EXT:    32768K  SYS:    11224K
+        ATB- REAL:                  1280K  SLOTS:                     0K
+             VIRT- ALLOC:      19M SHRD:       0M
+IEF236I ALLOC. FOR KC03CADA STEP02
+IEF237I 1001 ALLOCATED TO SYSLIB
+IEF237I 1001 ALLOCATED TO 
+IGD103I SMS ALLOCATED TO DDNAME SYSLIN
+IGD103I SMS ALLOCATED TO DDNAME SYSLMOD
+IEF237I JES2 ALLOCATED TO SYSPRINT
+IEF142I KC03CADA STEP02 - STEP WAS EXECUTED - COND CODE 0000
+IEF285I   CEE.SCEELKED                                 KEPT          
+IEF285I   VOL SER NOS= VTMVSC.                            
+IEF285I   CEE.SCEELKED                                 KEPT          
+IEF285I   VOL SER NOS= VTMVSC.                            
+IGD105I SYS23334.T005325.RA000.KC03CADA.OBJMOD2.H01  DELETED,   DDNAME=SYSLIN  
+IGD104I KC03CAD.CSCI465.LOADLIB                      RETAINED,  DDNAME=SYSLMOD 
+IEF285I   KC03CAD.KC03CADA.JOB07971.D0000103.?         SYSOUT        
+IEF373I STEP/STEP02  /START 2023334.0053
+IEF032I STEP/STEP02  /STOP  2023334.0053 
+        CPU:     0 HR  00 MIN  00.00 SEC    SRB:     0 HR  00 MIN  00.00 SEC    
+        VIRT:   144K  SYS:   248K  EXT:     1640K  SYS:    11164K
+        ATB- REAL:                  1280K  SLOTS:                     0K
+             VIRT- ALLOC:      18M SHRD:       0M
+IEF236I ALLOC. FOR KC03CADA STEP03
+IGD103I SMS ALLOCATED TO DDNAME STEPLIB
+IGD103I SMS ALLOCATED TO DDNAME
+IGD103I SMS ALLOCATED TO DDNAME SALEFILE
+IGD101I SMS ALLOCATED TO DDNAME (HSFILE  )
+        DSN (SYS23334.T005325.RA000.KC03CADA.R0171091    )
+        STORCLAS (TEMPSC) MGMTCLAS (        ) DATACLAS (        )
+        VOL SER NOS= KCTR01                                                                
+IEF237I JES2 ALLOCATED TO RPTFILE
+IEF237I JES2 ALLOCATED TO SYSDUMP
+IEF142I KC03CADA STEP03 - STEP WAS EXECUTED - COND CODE 0000
+IGD104I KC03CAD.CSCI465.LOADLIB                      RETAINED,  DDNAME=STEPLIB 
+IGD104I KC02322.CSCI465.LOADLIB                      RETAINED,  DDNAME=        
+IGD104I KC02322.CSCI465.DATAFA23                     RETAINED,  DDNAME=SALEFILE
+IGD105I SYS23334.T005325.RA000.KC03CADA.R0171091     DELETED,   DDNAME=HSFILE  
+IEF285I   KC03CAD.KC03CADA.JOB07971.D0000104.?         SYSOUT        
+IEF285I   KC03CAD.KC03CADA.JOB07971.D0000105.?         SYSOUT        
+IEF373I STEP/STEP03  /START 2023334.0053
+IEF032I STEP/STEP03  /STOP  2023334.0053 
+        CPU:     0 HR  00 MIN  00.00 SEC    SRB:     0 HR  00 MIN  00.00 SEC    
+        VIRT:    12K  SYS:   268K  EXT:        8K  SYS:    11244K
+        ATB- REAL:                  1280K  SLOTS:                     0K
+             VIRT- ALLOC:      18M SHRD:       0M
+IEF375I  JOB/KC03CADA/START 2023334.0053
+IEF033I  JOB/KC03CADA/STOP  2023334.0053 
+        CPU:     0 HR  00 MIN  00.01 SEC    SRB:     0 HR  00 MIN  00.00 SEC    
+
+                                         High Level Assembler Option Summary                   (PTF UI90738)   Page    1            
+
+
+                                                                                            HLASM R6.0  2023/11/30 00.53            
+
+  No Overriding ASMAOPT Parameters                                                                                                  
+  Overriding Parameters-  ASA                                                                                                       
+  No Process Statements                                                                                                             
+                                                                                                                                    
+                                                                                                                                    
+  Options for this Assembly                                                                                                         
+
+                    NOADATA                                                                                                         
+                      ALIGN                                                                                                         
+3 PARM/OPTION         ASA                                                                                                           
+                      ASCII(00819)                                                                                                  
+                      BATCH                                                                                                         
+                      CA(LOCAL)                                                                                                     
+                      CE(LOCAL)                                                                                                     
+                      CODEPAGE(01148)                                                                                               
+                    NOCOMPAT                                                                                                        
+                      CU(LOCAL)                                                                                                     
+                    NODATAMAP                                                                                                       
+                    NODBCS                                                                                                          
+                    NODECK                                                                                                          
+                      DXREF                                                                                                         
+                      EBCDIC(00037)                                                                                                 
+                      ESD                                                                                                           
+                    NOEXIT                                                                                                          
+                      FAIL(NOMSG,NOMNOTE,MAXERRS(500))                                                                              
+                      FLAG(0,ALIGN,CONT,EXLITW,NOIMPLEN,NOLONGER,NOPAGE0,PUSH,RECORD,RENT,NOSIGNED,NOSUBSTR,NOTRUNC,                
+                           USING0)                                                                                                  
+                    NOFOLD                                                                                                          
+                    NOGOFF                                                                                                          
+                      ILMA                                                                                                          
+                    NOINFO                                                                                                          
+                      LANGUAGE(EN)                                                                                                  
+                    NOLIBMAC                                                                                                        
+                      LINECOUNT(60)                                                                                                 
+                      LIST(121)                                                                                                     
+                      MACHINE(,NOLIST)                                                                                              
+                      MXREF(SOURCE)                                                                                                 
+                      OBJECT                                                                                                        
+                      OPTABLE(UNI,NOLIST)                                                                                           
+                    NOPCONTROL                                                                                                      
+                    NOPESTOP                                                                                                        
+                    NOPROFILE                                                                                                       
+                    NORA2                                                                                                           
+                    NORENT                                                                                                          
+                      RLD                                                                                                           
+                      RXREF                                                                                                         
+                      SECTALGN(8)                                                                                                   
+                      SIZE(MAX)                                                                                                     
+                    NOSUPRWARN                                                                                                      
+                      SYSPARM()                                                                                                     
+                    NOTERM                                                                                                          
+                    NOTEST                                                                                                          
+                      THREAD                                                                                                        
+                    NOTRANSLATE                                                                                                     
+                      TYPECHECK(MAGNITUDE,REGISTER,SIGNED)                                                                          
+                      UNICODE(01200)                                                                                                
+
+                                         High Level Assembler Option Summary                   (PTF UI90738)   Page    2            
+
+
+                                                                                            HLASM R6.0  2023/11/30 00.53            
+
+                      USING(NOLIMIT,MAP,WARN(15))                                                                                   
+                    NOWORKFILE                                                                                                      
+                      XREF(SHORT,UNREFS)                                                                                            
+                                                                                                                                    
+  No Overriding DD Names                                                                                                            
+
+                                              External Symbol Dictionary                                       Page    3            
+
+
+Symbol   Type   Id     Address  Length   Owner Id Flags Alias-of                            HLASM R6.0  2023/11/30 00.53            
+
+SALESRPT  SD 00000001 00000000 00000B78             00                                                                              
+
+                                                                                                               Page    4            
+  Active Usings: None                                                                                                               
+
+  Loc  Object Code    Addr1 Addr2  Stmt   Source Statement                                  HLASM R6.0  2023/11/30 00.53            
+
+                                      1          PRINT  NOGEN                MACRO CALL SUPPRESSION                                 
+                                      2 *********************************************************************                       
+                                      3 *                                                                   *                       
+                                      4 *     PROGRAM NAME: SALESRPT                                        *                       
+                                      5 *     PROGRAMMER:   Shakyla Smith-Bardney                           *                       
+                                      6 *     DUE DATE:     11/29/2023                                      *                       
+                                      7 *                                                                   *                       
+                                      8 *     FUNCTION: THIS PROGRAM READS INPUT DATA RECORDS               *                       
+                                      9 *               AND THEN WRITES THEM TO FORMATTED REPORTS.          *                       
+                                     10 *                                                                   *                       
+                                     11 *     INPUT: THE INPUT DATA CONTAINS RECORDS OF SALES               *                       
+                                     12 *            TRANSACTIONS AND OTHER BROKER INFO.                    *                       
+                                     13 *                                                                   *                       
+                                     14 *     OUTPUT: PRODUCE DETAIL AND SUMMARY LINES REGARDING            *                       
+                                     15 *             BROKER SALES AND TOTALS.                              *                       
+                                     16 *                                                                   *                       
+                                     17 *     ENTRY CONDITIONS: R1 HOLD ADDRESS OF RECORDS                  *                       
+                                     18 *                                                                   *                       
+                                     19 *     EXIT CONDITIONS: R1 RETURNS                                   *                       
+                                     20 *                                                                   *                       
+                                     21 *     NOTES: NONE                                                   *                       
+                                     22 *                                                                   *                       
+                                     23 *********************************************************************                       
+                                     24 *                                                                                           
+                                     25 * FUND (FIRST) RECORD INPUT                                                                 
+                                     26 *                                                                                           
+000000                00000 00050    27 $FUNDREC DSECT                                                                              
+000000                               28 $SHRPRC  DS    ZL5                                                                          
+000005                               29 $FUNDNME DS    CL35                                                                         
+000028                               30 $COMPCT1 DS    ZL6                                                                          
+00002E                               31 $COMPCT2 DS    ZL6                                                                          
+000034                               32 $COMPCT3 DS    ZL6                                                                          
+00003A                               33          DS    CL22                                                                         
+                                     34 *                                                                                           
+                                     35 * SALE RECORD INPUT                                                                         
+                                     36 *                                                                                           
+000000                00000 00050    37 $SALEREC DSECT                                                                              
+000000                               38 $BRNCNME DS    CL20                                                                         
+000014                               39 $BRKNME  DS    CL25                                                                         
+00002D                               40 $DEPAMT  DS    ZL10                                                                         
+000037                               41          DS    CL4                                                                          
+00003B                               42 $COMMFLG DS    ZL1                                                                          
+00003C                               43          DS    CL20                                                                         
+                                     44 *                                                                                           
+000000                00000 00B78    45 SALESRPT CSECT                       BEGIN CSECT                                            
+                                     46 *                                                                                           
+000000 90EC D00C            0000C    47          STM   14,12,12(13)          SAVE CALLER'S REGS                                     
+000004 18CF                          48          LR    12,15                 SET R12 TO R15                                         
+                 R:C  00000          49          USING SALESRPT,12           ESTABLISH R12 AS 1ST BASE REG                          
+000006 41E0 C348            00348    50          LA    14,REGS               R14 -> CURRENT SAVE AREA                               
+00000A 50D0 E004            00004    51          ST    13,4(,14)             SAVE CALLER'S SAVE AREA ADDR                           
+00000E 50E0 E008            00008    52          ST    14,8(,14)             SAVE CURRENT SAVE AREA ADDR                            
+000012 18DE                          53          LR    13,14                 R13 -> CURRENT SAVE AREA                               
+                                     54 *                                                                                           
+                                     55 * DO DATE AND TIME (EDIT TIME TO OUTPUT FIELD THEN TAKE THE 2 BYTES &                       
+
+                                                                                                               Page    5            
+  Active Usings: SALESRPT,R12                                                                                                       
+
+  Loc  Object Code    Addr1 Addr2  Stmt   Source Statement                                  HLASM R6.0  2023/11/30 00.53            
+
+                                     56 * PACK INTO 2 BYTE FIELD  (3 DIGITS) THEN DO CALC FOR CORRCT TME)                           
+                                     57 * MUST PRINT LEADING ZEROS IN COLUMN 2. COL 1 is carriage ctrl.                             
+                                     58 * Must incl. hex leading zero fill char.                                                    
+                                     59 *                                                                                           
+000014 5110 0000            00000    60 DATE     TIME  DEC,DATETIME,LINKAGE=SYSTEM,DATETYPE=MMDDYYYY                                
+                                     84 *                                                                                           
+00005E 0700                          85          LINK EP=JOBNAME,PARAM=JOBNAME,VL=1                                                 
+                                    103 *                                                                                           
+000082 0700                         104          OPEN  (SALEDCB,(INPUT))     OPEN INPUT FILE                                        
+00008E 12FF                         111          LTR   15,15                 CHECK FOR SUCCESSFUL OPEN                              
+000090 4780 C0A4            000A4   112          BZ    OPENOK1               BRANCH IF SUCCESSFUL TO OPENOK1                        
+000094 4110 00DE            000DE   113          ABEND 222,DUMP              ABEND IF OPEN FAILS & DISPLAY 222                      
+                                    123 *                                                                                           
+0000A4 4D10 C0AC            000AC   124 OPENOK1  OPEN  (RPTDCB,(OUTPUT))     OPEN OUTPUT FILE                                       
+0000AE 12FF                         131          LTR   15,15                 CHECK FOR SUCCESSFUL OPEN                              
+0000B0 4780 C0C8            000C8   132          BZ    OPENOK2               BRANCH IF SUCCESSFUL TO OPENOK2                        
+0000B4 4110 014D            0014D   133          ABEND 333,DUMP              ABEND IF OPEN FAILS & DISPLAY 333                      
+                                    143 *                                                                                           
+                                    144 * PROCESS FIRST RECORD                                                                      
+                                    145 *                                                                                           
+0000C4 5820 C4A0            004A0   146          L     2,LINECTR             INITIALIZE LINE CNTR                                   
+0000C8 4110 CA50            00A50   147 OPENOK2  GET   SALEDCB               READ THE FIRST RECORD - $fundrec                       
+0000D4 95E8 CAB0      00AB0         155          CLI   EOFFLAG,C'Y'          CHECK FOR END OF INPUT DATA                            
+0000D8 4780 C2DC            002DC   156          BE    NORECS                BRANCH TO ENDPGM IF EOF                                
+                                    157 *                                                                                           
+0000DC 1831                         158          LR    3,1                   LOCATION OF RECORD                                     
+                 R:3  00000         159          USING $FUNDREC,3            USE TEMPLATE FOR RECORD                                
+                                    160 *                                                                                           
+0000DE F224 C4B9 3000 004B9 00000   161          PACK  PSHRPRC(3),$SHRPRC(5) MOVE ISHRPRC TO SHRPRC                                 
+0000E4 DE06 C86D C4B9 0086D 004B9   162          ED    OSHRPRC,PSHRPRC       MOVE TO SHARE OUTPUT                                   
+0000EA D21F C751 3005 00751 00005   163          MVC   OFUNDNME(32),$FUNDNME MOVE $FUNDNME TO OFUNDNME                              
+0000F0 F235 C4BC 3028 004BC 00028   164          PACK  PCOMPCT1(4),$COMPCT1(6)  MOVE $COMPCT1 TO PCOMPCT1                           
+0000F6 F235 C4C0 302E 004C0 0002E   165          PACK  PCOMPCT2(4),$COMPCT2(6)  MOVE $COMPCT2 TO PCOMPCT2                           
+0000FC F235 C4C4 3034 004C4 00034   166          PACK  PCOMPCT3(4),$COMPCT3(6)  MOVE $COMPCT3 TO PCOMPCT3                           
+                                    167 *                                                                                           
+                                    168          DROP  3                                                                            
+                                    169 *                                                                                           
+                                    170 * PROCESS SECOND RECORD                                                                     
+                                    171 *                                                                                           
+000102 4120 0063            00063   172          LA    2,99                  R2 = 99                                                
+                                    173 *                                                                                           
+000106 4110 CA50            00A50   174          GET   SALEDCB               READ THE SECOND RECORD                                 
+                                    182 *                                                                                           
+000112 95E8 CAB0      00AB0         183 LOOP1    CLI   EOFFLAG,C'Y'          CHECK FOR END OF INPUT DATA                            
+                                    184 *                                                                                           
+000116 4780 C2B6            002B6   185          BE    ENDLOOP1              BRANCH TO ENDLOOP1 IF EOF                              
+                                    186 *                                                                                           
+00011A 1831                         187          LR    3,1                   LOCATION OF RECORD                                     
+                 R:3  00000         188          USING $SALEREC,3                                                                   
+                                    189 *                                                                                           
+00011C FA20 C498 C346 00498 00346   190          AP    PSALECTR(3),=PL1'1'   ADD 1 TO SALE RECORD COUNTER                           
+                                    191 *                                                                                           
+000122 D213 C532 3000 00532 00000   192          MVC   OBRNNME(20),$BRNCNME  MOVE FROM INPUT DATA TO PRINT                          
+000128 D218 C553 3014 00553 00014   193          MVC   OBRKNME(25),$BRKNME   MOVE FROM INPUT DATA TO PRINT                          
+                                    194 *                                                                                           
+
+                                                                                                               Page    6            
+  Active Usings: $SALEREC,R3  SALESRPT,R12                                                                                          
+
+  Loc  Object Code    Addr1 Addr2  Stmt   Source Statement                                  HLASM R6.0  2023/11/30 00.53            
+
+00012E F259 C4C8 302D 004C8 0002D   195          PACK  PDEPAMT(6),$DEPAMT(10) PACK IN DEP AMT TO USE FOR CALC                       
+000134 D20F C574 C521 00574 00521   196          MVC   ODEPAMT(16),PFORMAT                                                          
+00013A DF0F C574 C4C8 00574 004C8   197          EDMK  ODEPAMT(16),PDEPAMT    MOVE FROM INPUT DATA TO PRINT                         
+000140 0610                         198          BCTR  1,0                                                                          
+000142 925B 1000      00000         199          MVI   0(1),C'$'                                                                    
+000146 D20F C573 C574 00573 00574   200          MVC   OSALEREC+66(16),ODEPAMT                                                      
+                                    201 *                                                                                           
+00014C F230 C4E4 303B 004E4 0003B   202          PACK  PTCOMPCT(4),$COMMFLG(1)  MOVE COMM FLAG TO TEMP COM PCT                      
+                                    203 *                                                                                           
+                                    204          DROP  3                                                                            
+                                    205 *                                                                                           
+                                    206 * Load registers...                                                                         
+                                    207 *                                                                                           
+                                    208 *                                                                                           
+                                    209 * COMPUTE TOTALS ...                                                                        
+                                    210 *                                                                                           
+000152 FA65 C4D6 C4C8 004D6 004C8   211          AP    PTDEPAMT(7),PDEPAMT(6) ADD DEP AMT TO TOT DEP AMT                            
+                                    212 *                                                                                           
+                                    213 * CALC AMOUNT OF SHARES                                                                     
+                                    214 *                                                                                           
+000158 F8A5 C4A6 C4C8 004A6 004C8   215          ZAP   PCALC(11),PDEPAMT(6)  MOVE DEP AMT TO CALCULATIONS                           
+00015E F0A0 C4A6 0004 004A6 00004   216          SRP   PCALC(11),4,0         SHIFT 4 PLACES RT                                      
+000164 FDA2 C4A6 C4B9 004A6 004B9   217          DP    PCALC(11),PSHRPRC(3)  DEP AMT / SHR PRC = AMT SHRS                           
+00016A F075 C4A6 003F 004A6 0003F   218          SRP   PCALC(8),64-1,5       SHIFT 5 PLACES LT                                      
+000170 F070 C4A6 0001 004A6 00001   219          SRP   PCALC(8),1,0          SHIFT 1 PLACE RT                                       
+                                    220 *                                                                                           
+                                    221 *         ZAP   PSHRAMT(8),PCALC(8)   MOVE AMT OF SHARES TO SHR AMT                         
+                                    222 *         AP    PTSHRAMT(9),PCALC(8) ADD SHR AMT TO TOT SHR AMT                             
+000176 D213 C58D C320 0058D 00320   223          MVC   OSHRAMT(20),=X'4020202020206B2020206B2020214B2020202060'                     
+00017C DF13 C58D C4A6 0058D 004A6   224          EDMK  OSHRAMT,PCALC       MOVE SHARE AMT TO OUT SHR AMT                            
+                                    225 *                                                                                           
+                                    226 * CHECK IF HIGH SALE                                                                        
+                                    227 *                                                                                           
+                                    228 *         CP    PSHRAMT,=P'50000.0000' CHECK OF SHR AMT > 50,000                            
+                                    229 *         BL    NOT_HS               BRANCH TO NOT HS IF < 50K                              
+                                    230 *         AP    HSALECTR,=P'1'       ADD 1 TO HIGH SALE CTR                                 
+                                    231 *         PACK  HSSHRAMT(8),PSHRAMT(8) MOVE HS SHR AMT TO HS REC                            
+                                    232 *         MVC   HSBRKNME,OBRKNME     MOVE QUALIFYING BRK NME TO HS REC                      
+                                    233 *         AP    PHSTSHRA(9),PSHRAMT(8) ADD HIGH SHR AMT TO HS TOTAL                         
+                                    234 *         MVC   OHSHRAMT,PFORMAT     PLACE FORMAT IN OUTPUT                                 
+                                    235 *         ED    OHSHRAMT,HSSHRAMT    MOVE HIGH AMT TO OUTPUT                                
+                                    236 *         PUT   HSALEDCB,HSREC       WRITES TO HS REC                                       
+                                    237 *                                                                                           
+                                    238 * COMPUTE COMMISSION AMT                                                                    
+                                    239 *                                                                                           
+000182 95F1 C4E4      004E4         240 NOT_HS   CLI   PTCOMPCT,C'1'                                                                
+000186 4780 C19A            0019A   241          BE    PERCENT1                                                                     
+00018A 95F2 C4E4      004E4         242          CLI   PTCOMPCT,C'2'                                                                
+00018E 4780 C1B6            001B6   243          BE    PERCENT2                                                                     
+000192 95F3 C4E4      004E4         244          CLI   PTCOMPCT,C'3'                                                                
+000196 4780 C1D2            001D2   245          BE    PERCENT3                                                                     
+                                    246 *                                                                                           
+00019A F8A0 C4A6 C347 004A6 00347   247 PERCENT1 ZAP   PCALC(11),=P'0'       CLEAR PCALC TO USE                                     
+0001A0 F8A5 C4A6 C4C8 004A6 004C8   248          ZAP   PCALC(11),PDEPAMT(6)  SET DEP AMT TO COMMISSION AMT                          
+0001A6 FCA3 C4A6 C4BC 004A6 004BC   249          MP    PCALC(11),PCOMPCT1(4) DEPAMT * COMMISION PCT = COM AMT                       
+
+                                                                                                               Page    7            
+  Active Usings: SALESRPT,R12                                                                                                       
+
+  Loc  Object Code    Addr1 Addr2  Stmt   Source Statement                                  HLASM R6.0  2023/11/30 00.53            
+
+0001AC F0A5 C4A6 003F 004A6 0003F   250          SRP   PCALC(11),(64-1),5        SHIFT COMMISSION AMT LT BY 5                       
+0001B2 47F0 C206            00206   251          B     CONTINUE                                                                     
+0001B6 F8A0 C4A6 C347 004A6 00347   252 PERCENT2 ZAP   PCALC(11),=P'0'       CLEAR PCALC TO USE                                     
+0001BC F8A5 C4A6 C4C8 004A6 004C8   253          ZAP   PCALC(11),PDEPAMT(6)  SET DEP AMT TO COMMISSION AMT                          
+0001C2 FCA3 C4A6 C4BC 004A6 004BC   254          MP    PCALC(11),PCOMPCT1(4) DEPAMT * COMMISION PCT = COM AMT                       
+0001C8 F0A5 C4A6 003F 004A6 0003F   255          SRP   PCALC(11),(64-1),5        SHIFT COMMISSION AMT LT BY 5                       
+0001CE 47F0 C206            00206   256          B     CONTINUE                                                                     
+0001D2 F8A0 C4A6 C347 004A6 00347   257 PERCENT3 ZAP   PCALC(11),=P'0'       CLEAR PCALC TO USE                                     
+0001D8 F8A5 C4A6 C4C8 004A6 004C8   258          ZAP   PCALC(11),PDEPAMT(6)  SET DEP AMT TO COMMISSION AMT                          
+0001DE FCA3 C4A6 C4BC 004A6 004BC   259          MP    PCALC(11),PCOMPCT1(4) DEPAMT * COMMISION PCT = COM AMT                       
+0001E4 F0A5 C4A6 003F 004A6 0003F   260          SRP   PCALC(11),(64-1),5        SHIFT COMMISSION AMT LT BY 5                       
+0001EA 47F0 C206            00206   261          B     CONTINUE                                                                     
+                                    262 *                                                                                           
+0001EE F85A C4E8 C4A6 004E8 004A6   263          ZAP   PCOMMAMT(6),PCALC(11)  MOVE COMM AMT TO CORRECT SPOT                         
+0001F4 FA65 C4DD C4E8 004DD 004E8   264          AP    PTCOMAMT(7),PCOMMAMT(6)  ADD COMM. AMT TO TOT COMM AMT                       
+0001FA D20E C5A9 C33C 005A9 0033C   265          MVC   OCOMAMT(15),=X'40206B20202120202060' FORMAT COMM. AMT                        
+000200 DE0E C5A9 C4E8 005A9 004E8   266          ED    OCOMAMT,PCOMMAMT      MOVE COMM AMT TO OUT COMM AMT                          
+                                    267 *                                                                                           
+                                    268 * PRINT HDRS IF LINE CTR > 18                                                               
+                                    269 *                                                                                           
+000206 5920 C334            00334   270 CONTINUE C     2,=F'18'              CHECK IF LINE 18 TO PRNT HDRS                          
+00020A 4740 C292            00292   271          BL    CONTINU2                                                                     
+00020E FA10 C4A4 C346 004A4 00346   272          AP    PPAGECTR(2),=PL1'1'     ADD 1 TO PGE CTR                                     
+000214 D202 C7A1 C338 007A1 00338   273          MVC   OPAGECTR(3),=X'40202120' FORMAT PAGE CTR OUTPUT                              
+00021A DE02 C7A1 C4A4 007A1 004A4   274          ED    OPAGECTR,PPAGECTR     MOVE PAGE CTR TO OUT PAGE CTR                          
+                                    275 *                                                                                           
+000220 4110 CB18            00B18   276          PUT   RPTDCB,HEADER1        WRITE HEADER 1 TO FILE                                 
+000230 4110 CB18            00B18   285          PUT   RPTDCB,HEADER2        WRITE HEADER 2 TO FILE                                 
+000240 4110 CB18            00B18   294          PUT   RPTDCB,BLNKLINE       WRITE BLANK LINE TO FILE                               
+000250 4110 CB18            00B18   303          PUT   RPTDCB,HEADER3        WRITE HEADER 3 TO FILE                                 
+000260 4110 CB18            00B18   312          PUT   RPTDCB,BLNKLINE       WRITE BLANK LINE TO FILE                               
+000270 4110 CB18            00B18   321          PUT   RPTDCB,SALECOL        WRITE SALES REPORT COLUMN                              
+000280 4110 CB18            00B18   330          PUT   RPTDCB,HYPHEN1        WRITE SALES REPORT HYPHENS                             
+000290 1B22                         339          SR    2,2                   SET LINE CTR REG TO ZERO                               
+                                    340 *                                                                                           
+000292 4110 CB18            00B18   341 CONTINU2 PUT   RPTDCB,OSALEREC       WRITE THE OSALEREC LINE TO REPORT                      
+0002A2 4120 2001            00001   350          LA    2,1(,2)               ADD 1 TO LINE COUNTER                                  
+                                    351 *                                                                                           
+0002A6 4110 CA50            00A50   352          GET   SALEDCB               GET THE NEXT RECORD                                    
+                                    360 *                                                                                           
+0002B2 47F0 C112            00112   361          B     LOOP1                 BRANCH TO TOP OF LOOP1                                 
+                                    362 *                                                                                           
+0002B6 DE02 C6D9 C498 006D9 00498   363 ENDLOOP1 ED    OHSCTR,PSALECTR       EDIT REC COUNTER INTO TOTALS                           
+                                    364 *                                                                                           
+0002BC 4110 CB18            00B18   365          PUT   RPTDCB,BLNKLINE                                                              
+0002CC 4110 CB18            00B18   374          PUT   RPTDCB,HEADER1        WRITE SALES FILE TOTALS LINE                           
+                                    383 *                                                                                           
+0002DC 4D10 C2E8            002E8   384 NORECS   CLOSE (SALEDCB,,RPTDCB)     CLOSE THE TWO DCBs                                     
+                                    393 *                                                                                           
+                                    394 * WRITE HIGH SALES FILE...HSALEDCB - HSFILE                                                 
+                                    395 *                                                                                           
+                                    396 * MOVE PACKED HIGH SALES TOTAL TO OUTPUT HIGH SHR AMT                                       
+                                    397 *                                                                                           
+                                    398 *                                                                                           
+0002EA 1BFF                         399          SR    15,15                 SET RC TO 0                                            
+
+                                                                                                               Page    8            
+  Active Usings: SALESRPT,R12                                                                                                       
+
+  Loc  Object Code    Addr1 Addr2  Stmt   Source Statement                                  HLASM R6.0  2023/11/30 00.53            
+
+0002EC 58D0 D004            00004   400          L     13,4(,13)             R13 -> CALLER'S SAVE AREA                              
+0002F0 58E0 D00C            0000C   401          L     14,12(,13)            RESTORE R14                                            
+0002F4 980C D014            00014   402          LM    0,12,20(13)           RESTORE R0 THROUGH R12                                 
+                                    403 *                                                                                           
+0002F8 07FE                         404          BR    14                    RETURN TO CALLER                                       
+                                    405 *                                                                                           
+0002FA                002FA 00300   406          ORG   SALESRPT+((*-SALESRPT+31)/32)*32                                             
+000300 C8C5D9C540C9E240             407          DC    C'HERE IS THE STORAGE FOR SALESRPT'                                          
+                                    408 *                                                                                           
+000320                              409          LTORG                       LTORG TO ORGANIZE LITERALS                             
+000320 4020202020206B20             410                =X'4020202020206B2020206B2020214B2020202060'                                 
+000334 00000012                     411                =F'18'                                                                       
+000338 40202120                     412                =X'40202120'                                                                 
+00033C 40206B2020212020             413                =X'40206B20202120202060'                                                     
+000346 1C                           414                =PL1'1'                                                                      
+000347 0C                           415                =P'0'                                                                        
+                                    416 *                                                                                           
+                                    417 *                                                                                           
+000348 0000000000000000             418 REGS     DC    18F'0'                MAINREGS FOR STANDARD LINKAGE                          
+                                    419 *                                                                                           
+000390 4040404040404040             420 OUTPUT   DC    CL132' '              OUTPUT LINE                                            
+                                    421 *                                                                                           
+000414 4040404040404040             422 BLNKLINE DC    CL132' '              BLANKLINE                                              
+                                    423 *                                                                                           
+                                    424 * COUNTERS                                                                                  
+                                    425 *                                                                                           
+000498 00000C                       426 PSALECTR DC    PL3'0'                PACKED RECORD CTR FIELD                                
+00049B 00000C                       427 HSALECTR DC    PL3'0'                HIGH SALE COUNTER                                      
+00049E 0000                                                                                                                         
+0004A0 00000000                     428 LINECTR  DC    F'0'                  DEFINE LINE CTR                                        
+0004A4 000C                         429 PPAGECTR DC    PL2'0'                PACKED PAGE CTR                                        
+                                    430 *                                                                                           
+                                    431 * CALCULATIONS                                                                              
+                                    432 *                                                                                           
+0004A6 0000000000000000             433 PCALC    DC    PL11'0'               USE FOR PACKED CALCULATIONS TEMP                       
+0004B1 000000000000000C             434 PCALC2   DC    PL8'0'                USE FOR PACKED CALCULATIONS TEMP                       
+0004B9 00000C                       435 PSHRPRC  DC    PL3'0'                PACKED SHARE PRICE                                     
+0004BC 0000000C                     436 PCOMPCT1 DC    PL4'0'                PACKED COMM. PERCENT 1                                 
+0004C0 0000000C                     437 PCOMPCT2 DC    PL4'0'                PACKED COMM. PERCENT 1                                 
+0004C4 0000000C                     438 PCOMPCT3 DC    PL4'0'                PACKED COMM. PERCENT 1                                 
+0004C8 00000000000C                 439 PDEPAMT  DC    PL6'0'                PACKED DEPOSIT AMOUNT                                  
+0004CE 000000000000000C             440 PSHRAMT  DC    PL8'0'                PACKED SHARE AMOUNT                                    
+0004D6 0000000000000C               441 PTDEPAMT DC    PL7'0'                PACKED DEPOSIT AMOUNT                                  
+0004DD 0000000000000C               442 PTCOMAMT DC    PL7'0'                PACKED TOTAL COMMISSION AMOUNT                         
+0004E4 0000000C                     443 PTCOMPCT DC    PL4'0'                PACKED TOTAL COMMISSION PERC.                          
+0004E8 00000000000C                 444 PCOMMAMT DC    PL6'0'                PACKED COMMISSION AMOUNT                               
+0004EE 0000000000000000             445 PTSHRAMT DC    PL9'0'                PACKED SHARE AMOUNT                                    
+0004F7 000000000000000C             446 HSSHRAMT DC    PL8'0'                HIGH SALES SHARE AMOUNT                                
+0004FF 4040404040404040             447 HSBRKNME DC    CL25' '               HIGH SALES BROKER NAME                                 
+000518 0000000000000000             448 PHSTSHRA DC    PL9'0'                PACKED HIGH SALES TOT SHR AMT                          
+                                    449 *                                                                                           
+                                    450 * PACKED DECIMAL FORMAT TO DISPLAY DEPOSIT AMNT                                             
+                                    451 *                                                                                           
+000521 402020206B202020             452 PFORMAT  DC    X'402020206B2020206B2020214B202060'                                          
+                                    453 *                                                                                           
+
+                                                                                                               Page    9            
+  Active Usings: SALESRPT,R12                                                                                                       
+
+  Loc  Object Code    Addr1 Addr2  Stmt   Source Statement                                  HLASM R6.0  2023/11/30 00.53            
+
+                                    454 *                                                                                           
+                                    455 * OUT SALE RECORD                                                                           
+                                    456 *                                                                                           
+000531 F0                           457 OSALEREC DC    C'0'                  OSALEREC CARRIAGE CONTROL                              
+000532 4040404040404040             458 OBRNNME  DC    CL20' '               OUT BRANCH NAME                                        
+000546 4040404040404040             459          DC    CL13' '               SPACES                                                 
+000553 4040404040404040             460 OBRKNME  DC    CL25' '               OUT BROKER NAME                                        
+00056C 4040404040404040             461          DC    CL8' '                SPACES                                                 
+000574 F040404040404040             462 ODEPAMT  DC    CL16'0'               OUT DEPOSIT AMOUNT                                     
+000584 4040404040404040             463          DC    CL9' '                SPACES                                                 
+00058D 4040404040404040             464 OSHRAMT  DC    CL20' '               OUT SHARE AMOUNT                                       
+0005A1 4040404040404040             465          DC    CL8' '               SPACES                                                  
+0005A9 F040404040404040             466 OCOMAMT  DC    CL15'0'               OUT COMMISSION AMOUNT                                  
+                                    467 *                                                                                           
+                                    468 * OUT SALES REPORT TOTALS                                                                   
+                                    469 *                                                                                           
+0005B8                              470 OSALETOT DC    0H                    OUT SALES TOTAL                                        
+0005B8 4040404040404040             471          DC    CL51' '               SPACES                                                 
+0005EB 40202120                     472 OSALECTR DC    X'40202120'           OUT SALE COUNTER                                       
+0005EF 4040404040404040             473          DC    CL13' '               SPACES                                                 
+0005FC                              474 OTDEPAMT DS    CL18' '               OUT DEPOSIT AMOUNT                                     
+00060E 404040                       475          DC    CL3' '                SPACES                                                 
+000611                              476 OTSHRAMT DS    CL23' '               OUT SHARE AMOUNT                                       
+000628 404040                       477          DC    CL3' '                SPACES                                                 
+00062B                              478 OTCOMAMT DS    CL18' '               OUT TOTAL COMMISSION AMT                               
+                                    479 *                                                                                           
+                                    480 * OUT HIGH SALES RECORD                                                                     
+                                    481 *                                                                                           
+00063D 00                                                                                                                           
+00063E                              482 HSREC    DC    0H                                                                           
+00063E 4040404040404040             483          DC    CL37' '               SPACES                                                 
+000663                              484 OHBRKNME DS    CL25' '               OUT HIGH SALE BROKER NAME                              
+00067C 4040404040404040             485          DC    CL13' '               SPACES                                                 
+000689 4040404040404040             486 OHSHRAMT DC    CL20' '               OUT HIGH SALES SHARE AMT                               
+                                    487 *                                                                                           
+                                    488 * OUT HIGH SALES REPORT TOTALS                                                              
+                                    489 *                                                                                           
+00069D 00                                                                                                                           
+00069E                              490 OHSRPTOT DC    0H                                                                           
+00069E 4040404040404040             491          DC    CL59' '               SPACES                                                 
+0006D9 404040                       492 OHSCTR   DC    CL3' '                OUT HIGH SALES CTR                                     
+0006DC 4040404040404040             493          DC    CL19' '               SPACES                                                 
+0006EF 4040404040404040             494 OHSTSHRS DC    CL23' '               OUT HIGH SALES SHARES TOTAL                            
+000706 4040404040404040             495          DC    CL25' '               SPACES                                                 
+                                    496 *                                                                                           
+                                    497 * HEADER LINE 1                                                                             
+                                    498 *                                                                                           
+00071F 00                                                                                                                           
+000720                              499 HEADER1  DC    0H                                                                           
+000720 4040404040404040             500          DC    CL10' '               SPACES                                                 
+00072A 4040404040404040             501          DC    CL39' '               SPACES                                                 
+000751 4040404040404040             502 OFUNDNME DC    CL32' '               OUT FUND NAME                                          
+000771 4040404040404040             503          DC    CL42' '               SPACES                                                 
+00079B D7C1C7C57A40                 504          DC    C'PAGE: '             TEXT                                                   
+0007A1 404040                       505 OPAGECTR DC    CL3' '                OUT PAGE CTR                                           
+
+                                                                                                               Page   10            
+  Active Usings: SALESRPT,R12                                                                                                       
+
+  Loc  Object Code    Addr1 Addr2  Stmt   Source Statement                                  HLASM R6.0  2023/11/30 00.53            
+
+                                    506 *                                                                                           
+                                    507 * HEADER LINE 2                                                                             
+                                    508 *                                                                                           
+0007A4                              509 HEADER2  DC    0H                                                                           
+0007A4 4040404040404040             510          DC    CL48' '               SPACES                                                 
+0007D4 C2D9D6D2C5D940E2             511          DC    C'BROKER SALES AND COMMISSIONS REPORT'                                       
+0007F7 4040404040404040             512          DC    CL32' '               SPACES                                                 
+000817 D1D6C2D5C1D4C57A             513          DC    C'JOBNAME: '          TEXT                                                   
+000820 D1D6C2D5C1D4C540             514 JOBNAME  DC    C'JOBNAME '           JOBNAME OUTPUT                                         
+                                    515 *                                                                                           
+                                    516 * HEADER LINE 3                                                                             
+                                    517 *                                                                                           
+000828                              518 HEADER3  DC    0H                                                                           
+000828 4040404040404040             519          DC    CL55' '               SPACES                                                 
+00085F E2C8C1D9C540D7D9             520          DC    C'SHARE PRICE:  '     TEXT                                                   
+00086D 20215B204B2020               521 OSHRPRC  DC    X'20215B204B2020'     OUT SHARE PRICE                                        
+000874 4040404040404040             522          DC    CL57' '               SPACES                                                 
+                                    523 *                                                                                           
+                                    524 * SALES REPORT COLUMN HEADER                                                                
+                                    525 *                                                                                           
+0008AD 00                                                                                                                           
+0008AE                              526 SALECOL  DC    0H                                                                           
+0008AE 40C2D9C1D5C3C840             527          DC    C' BRANCH NAME'        BRANCH NAME                                           
+0008BA 4040404040404040             528          DC    CL22' '               SPACES                                                 
+0008D0 C2D9D6D2C5D940D5             529          DC    C'BROKER NAME'        BROKER NAME                                            
+0008DB 4040404040404040             530          DC    CL23' '                SPACES                                                
+0008F2 C4C5D7D6E2C9E340             531          DC    C'DEPOSIT AMOUNT'     DEPOSIT AMOUNT                                         
+000900 4040404040404040             532          DC    CL15' '               SPACES                                                 
+00090F E2C8C1D9C540C1D4             533          DC    C'SHARE AMOUNT'       TEXT                                                   
+00091B 4040404040404040             534          DC    CL14' '               SPACES                                                 
+000929 C3D6D4D4C9E2E2C9             535          DC    C'COMMISSION'         TEXT                                                   
+                                    536 *                                                                                           
+                                    537 * TOTALS COLUMN HEADER                                                                      
+                                    538 *                                                                                           
+000933 00                                                                                                                           
+000934                              539 TOTLCOL  DC    0H                                                                           
+000934 4040404040404040             540          DC    CL39' '                                                                      
+00095B D5E4D4C2C5D940D6             541          DC    C'NUMBER OF SALES'                                                           
+00096A 4040404040404040             542          DC    CL9' '                                                                       
+000973 E3D6E3C1D340E2C1             543          DC    C'TOTAL SALES AMOUNT'                                                        
+000985 4040404040404040             544          DC    CL9' '                                                                       
+00098E E3D6E3C1D340E2C8             545          DC    C'TOTAL SHARE AMOUNT'                                                        
+0009A0 4040404040404040             546          DC    CL8' '                                                                       
+0009A8 E3D6E3C1D340C3D6             547          DC    C'TOTAL COMMISSION'                                                          
+                                    548 *                                                                                           
+                                    549 *                                                                                           
+                                    550 * HIGH SALES COLUMN HEADER                                                                  
+                                    551 *                                                                                           
+                                    552 *                                                                                           
+                                    553 * HS TOTALS COLUMN HEADER                                                                   
+                                    554 *                                                                                           
+                                    555 * HYPHENS 1 - 4...                                                                          
+                                    556 *                                                                                           
+                                    557 * SALES COLUMN HYPHEN LINE                                                                  
+                                    558 *                                                                                           
+
+                                                                                                               Page   11            
+  Active Usings: SALESRPT,R12                                                                                                       
+
+  Loc  Object Code    Addr1 Addr2  Stmt   Source Statement                                  HLASM R6.0  2023/11/30 00.53            
+
+0009B8 6060606060606060             559 HYPHEN1  DC    21C'-'                                                                       
+0009CD 4040404040404040             560          DC    CL13' '                                                                      
+0009DA 6060606060606060             561          DC    25C'-'                                                                       
+0009F3 4040404040404040             562          DC    CL9' '                                                                       
+0009FC 6060606060606060             563          DC    14C'-'                                                                       
+000A0A 4040404040404040             564          DC    CL9' '                                                                       
+000A13 6060606060606060             565          DC    18C'-'                                                                       
+000A25 4040404040404040             566          DC    CL10' '                                                                      
+000A2F 6060606060606060             567          DC    14C'-'                                                                       
+                                    568 *                                                                                           
+                                    569 *                                                                                           
+                                    570 * CURRENT DATE FIELDS                                                                       
+                                    571 *                                                                                           
+000A40                              572 DATETIME DS    4F                    STORAGE FOR TIME MACRO USAGE                           
+                                    573 *                                                                                           
+                                    574 *                                                                                           
+                                    575 *  INPUT DCB                                                                                
+                                    576 *                                                                                           
+                                    577 SALEDCB  DCB   DDNAME=SALEFILE,                                        X                    
+                                                       DEVD=DA,                                                X                    
+                                                       DSORG=PS,                                               X                    
+                                                       MACRF=GL,  MACRF=(GL,PM),                               X                    
+                                                       RECFM=FB,                                               X                    
+                                                       LRECL=80,                                               X                    
+000A50 0000000000000000                                EODAD=EOFRTN                                                                 
+000AB0 D5                           619 EOFFLAG  DC    C'N'                 EOFFLAG FOR INPUT FILE                                  
+                                    620 *                                                                                           
+000AB1 00                                                                                                                           
+000AB2 92E8 CAB0      00AB0         621 EOFRTN   MVI   EOFFLAG,C'Y'          SET EOF FLAG TO Y                                      
+000AB6 07FE                         622          BR    14                    BRANCH TO STMT FOLLOWING GET                           
+                                    623 *                                                                                           
+                                    624 *                                                                                           
+                                    625 *  HIGH SALE OUTPUT DCB                                                                     
+                                    626 *                                                                                           
+                                    627 HSALEDCB DCB   DDNAME=HSFILE,                                          X                    
+                                                       DEVD=DA,                                                X                    
+                                                       DSORG=PS,                                               X                    
+                                                       MACRF=PM,                                               X                    
+                                                       RECFM=FBA,                                              X                    
+                                                       LRECL=133,                                              X                    
+000AB8 0000000000000000                                BLKSIZE=2660                                                                 
+                                    669 *                                                                                           
+                                    670 *  OUTPUT DCB                                                                               
+                                    671 *                                                                                           
+                                    672 RPTDCB   DCB   DDNAME=RPTFILE,                                         X                    
+                                                       DEVD=DA,                                                X                    
+                                                       DSORG=PS,                                               X                    
+                                                       MACRF=PM,                                               X                    
+                                                       RECFM=FBA,                                              X                    
+                                                       LRECL=133,                                              X                    
+000B18 0000000000000000                                BLKSIZE=2660                                                                 
+                                    714 *                                                                                           
+000000                              715          END   SALESRPT                                                                     
+
+                                                 Relocation Dictionary                                         Page   12            
+
+
+   Pos.Id   Rel.Id   Address  Type    Length  Action                                        HLASM R6.0  2023/11/30 00.53            
+
+  00000001 00000001 00000068   A         4       +                                                                                  
+  00000001 00000001 00000070   A         4       +                                                                                  
+  00000001 00000001 00000089   A         3       +                                                                                  
+  00000001 00000001 000000A9   A         3       +                                                                                  
+  00000001 00000001 000002E1   A         3       +                                                                                  
+  00000001 00000001 000002E5   A         3       +                                                                                  
+  00000001 00000001 00000A71   A         3       +                                                                                  
+
+                               Ordinary Symbol and Literal Cross Reference                                     Page   13            
+
+
+Symbol   Length   Value     Id    R Type Asm  Program   Defn References                     HLASM R6.0  2023/11/30 00.53            
+
+$BRKNME      25 00000014 FFFFFFFE     C  C                39  193                                                                   
+$BRNCNME     20 00000000 FFFFFFFE     C  C                38  192                                                                   
+$COMMFLG      1 0000003B FFFFFFFE     Z  Z                42  202                                                                   
+$COMPCT1      6 00000028 FFFFFFFF     Z  Z                30  164                                                                   
+$COMPCT2      6 0000002E FFFFFFFF     Z  Z                31  165                                                                   
+$COMPCT3      6 00000034 FFFFFFFF     Z  Z                32  166                                                                   
+$DEPAMT      10 0000002D FFFFFFFE     Z  Z                40  195                                                                   
+$FUNDNME     35 00000005 FFFFFFFF     C  C                29  163                                                                   
+$FUNDREC      1 00000000 FFFFFFFF     J                   27  159U                                                                  
+$SALEREC      1 00000000 FFFFFFFE     J                   37  188U                                                                  
+$SHRPRC       5 00000000 FFFFFFFF     Z  Z                28  161                                                                   
+BLNKLINE    132 00000414 00000001     C  C               422  299   317   370                                                       
+CONTINUE      4 00000206 00000001     I                  270  251B  256B  261B                                                      
+CONTINU2      4 00000292 00000001     I                  345  271B                                                                  
+DATETIME      4 00000A40 00000001     F  F               572   81                                                                   
+ENDLOOP1      6 000002B6 00000001     I                  363  185B                                                                  
+EOFFLAG       1 00000AB0 00000001     C  C               619  155   183   621M                                                      
+EOFRTN        4 00000AB2 00000001     I                  621  594                                                                   
+HEADER1       2 00000720 00000001     H  H               499  281   379                                                             
+HEADER2       2 000007A4 00000001     H  H               509  290                                                                   
+HEADER3       2 00000828 00000001     H  H               518  308                                                                   
+HYPHEN1       1 000009B8 00000001     C  C               559  335                                                                   
+IHB0001D      4 00000020 00000001     F  F                67   65                                                                   
+IHB0001W      2 0000003C 00000001     H  H                74   66B                                                                  
+IHB0005       1 00000068 00000001     U                   92   90                                                                   
+IHB0005A      1 0000006C 00000001     U                   94   91B                                                                  
+JOBNAME       8 00000820 00000001     C  C               514   93                                                                   
+LINECTR       4 000004A0 00000001     F  F               428  146                                                                   
+LOOP1         4 00000112 00000001     I                  183  361B                                                                  
+NORECS        4 000002DC 00000001     I                  387  156B                                                                  
+OBRKNME      25 00000553 00000001     C  C               460  193M                                                                  
+OBRNNME      20 00000532 00000001     C  C               458  192M                                                                  
+OCOMAMT      15 000005A9 00000001     C  C               466  265M  266M                                                            
+ODEPAMT      16 00000574 00000001     C  C               462  196M  197M  200                                                       
+OFUNDNME     32 00000751 00000001     C  C               502  163M                                                                  
+OHSCTR        3 000006D9 00000001     C  C               492  363M                                                                  
+OPAGECTR      3 000007A1 00000001     C  C               505  273M  274M                                                            
+OPENOK1       4 000000A4 00000001     I                  127  112B                                                                  
+OPENOK2       4 000000C8 00000001     I                  151  132B                                                                  
+OSALEREC      1 00000531 00000001     C  C               457  200M  346                                                             
+OSHRAMT      20 0000058D 00000001     C  C               464  223M  224M                                                            
+OSHRPRC       7 0000086D 00000001     X  X               521  162M                                                                  
+PCALC        11 000004A6 00000001     P  P               433  215M  216M  217M  218M  219M  224   247M  248M  249M  250M            
+                                                              252M  253M  254M  255M  257M  258M  259M  260M  263                   
+PCOMMAMT      6 000004E8 00000001     P  P               444  263M  264   266                                                       
+PCOMPCT1      4 000004BC 00000001     P  P               436  164M  249   254   259                                                 
+PCOMPCT2      4 000004C0 00000001     P  P               437  165M                                                                  
+PCOMPCT3      4 000004C4 00000001     P  P               438  166M                                                                  
+PDEPAMT       6 000004C8 00000001     P  P               439  195M  197   211   215   248   253   258                               
+PERCENT1      6 0000019A 00000001     I                  247  241B                                                                  
+PERCENT2      6 000001B6 00000001     I                  252  243B                                                                  
+PERCENT3      6 000001D2 00000001     I                  257  245B                                                                  
+PFORMAT      16 00000521 00000001     X  X               452  196                                                                   
+PPAGECTR      2 000004A4 00000001     P  P               429  272M  274                                                             
+PSALECTR      3 00000498 00000001     P  P               426  190M  363                                                             
+
+                               Ordinary Symbol and Literal Cross Reference                                     Page   14            
+
+
+Symbol   Length   Value     Id    R Type Asm  Program   Defn References                     HLASM R6.0  2023/11/30 00.53            
+
+PSHRPRC       3 000004B9 00000001     P  P               435  161M  162   217                                                       
+PTCOMAMT      7 000004DD 00000001     P  P               442  264M                                                                  
+PTCOMPCT      4 000004E4 00000001     P  P               443  202M  240   242   244                                                 
+PTDEPAMT      7 000004D6 00000001     P  P               441  211M                                                                  
+REGS          4 00000348 00000001     F  F               418   50                                                                   
+RPTDCB        4 00000B18 00000001     F  F               677  129   280   289   298   307   316   325   334   345   369             
+                                                              378   391                                                             
+SALECOL       2 000008AE 00000001     H  H               526  326                                                                   
+SALEDCB       4 00000A50 00000001     F  F               582  109   151   178   356   389                                           
+SALESRPT      1 00000000 00000001     J                   45   49U  406   406   715                                                 
+=F'18'        4 00000334 00000001     F                  411  270                                                                   
+=P'0'         1 00000347 00000001     P                  415  247   252   257                                                       
+=PL1'1'       1 00000346 00000001     P                  414  190   272                                                             
+=X'4020202020206B2020206B2020214B2020202060'                                                                                        
+             20 00000320 00000001     X                  410  223                                                                   
+=X'40202120'                                                                                                                        
+              4 00000338 00000001     X                  412  273                                                                   
+=X'40206B20202120202060'                                                                                                            
+             10 0000033C 00000001     X                  413  265                                                                   
+
+                                  Unreferenced Symbols Defined in CSECTs                                       Page   15            
+
+
+  Defn  Symbol                                                                              HLASM R6.0  2023/11/30 00.53            
+
+    63  DATE                                                                                                                        
+   427  HSALECTR                                                                                                                    
+   632  HSALEDCB                                                                                                                    
+   447  HSBRKNME                                                                                                                    
+   482  HSREC                                                                                                                       
+   446  HSSHRAMT                                                                                                                    
+   240  NOT_HS                                                                                                                      
+   484  OHBRKNME                                                                                                                    
+   486  OHSHRAMT                                                                                                                    
+   490  OHSRPTOT                                                                                                                    
+   494  OHSTSHRS                                                                                                                    
+   472  OSALECTR                                                                                                                    
+   470  OSALETOT                                                                                                                    
+   478  OTCOMAMT                                                                                                                    
+   474  OTDEPAMT                                                                                                                    
+   476  OTSHRAMT                                                                                                                    
+   420  OUTPUT                                                                                                                      
+   434  PCALC2                                                                                                                      
+   448  PHSTSHRA                                                                                                                    
+   440  PSHRAMT                                                                                                                     
+   445  PTSHRAMT                                                                                                                    
+   539  TOTLCOL                                                                                                                     
+
+                                          Macro and Copy Code Source Summary                                   Page   16            
+
+
+ Con Source                                        Volume    Members                        HLASM R6.0  2023/11/30 00.53            
+
+  L1 SYS1.MACLIB                                   VTMVSC    ABEND    CLOSE    DCB      GET      IHBINNRA IHBINNRB                  
+                                                             IHBINNRR IHBOPLST IHB01    LINK     OPEN     PUT                       
+                                                             SYSSTATE TIME                                                          
+
+                                                Dsect Cross Reference                                          Page   17            
+
+
+Dsect     Length      Id       Defn                                                         HLASM R6.0  2023/11/30 00.53            
+
+$FUNDREC 00000050  FFFFFFFF      27                                                                                                 
+$SALEREC 00000050  FFFFFFFE      37                                                                                                 
+
+                                                      Using Map                                                Page   18            
+
+
+                                                                                            HLASM R6.0  2023/11/30 00.53            
+  Stmt  -----Location----- Action ----------------Using----------------- Reg Max     Last Label and Using Text                      
+          Count      Id           Type          Value    Range     Id        Disp    Stmt                                           
+
+    49  00000006  00000001 USING  ORDINARY    00000000 00001000 00000001  12 00B18    621 SALESRPT,12                               
+   159  000000DE  00000001 USING  ORDINARY    00000000 00001000 FFFFFFFF   3 00034    166 $FUNDREC,3                                
+   168  00000102  00000001 DROP                                            3              3                                         
+   188  0000011C  00000001 USING  ORDINARY    00000000 00001000 FFFFFFFE   3 0003B    202 $SALEREC,3                                
+   204  00000152  00000001 DROP                                            3              3                                         
+
+                                   General Purpose Register Cross Reference                                    Page   19            
+
+
+ Register  References (M=modified, B=branch, U=USING, D=DROP, N=index)                      HLASM R6.0  2023/11/30 00.53            
+
+    0(0)      47   119M  120M  121   139M  140M  141   281M  290M  299M  308M  317M  326M  335M  346M  370M  379M  402M             
+    1(1)      47    64M   65M   75    76    82    90M  107M  118M  121M  127M  138M  141M  151M  153   158   178M  180              
+             187   197M  198M  199   224M  280M  283   289M  292   298M  301   307M  310   316M  319   325M  328   334M             
+             337   345M  348   356M  358   369M  372   378M  381   387M  402M                                                       
+    2(2)      47   146M  172M  270   339M  339   350M  350   402M                                                                   
+    3(3)      47    80M  158M  159U  168D  187M  188U  204D  402M                                                                   
+    4(4)      47    80M  402M                                                                                                       
+    5(5)      47   402M                                                                                                             
+    6(6)      47   402M                                                                                                             
+    7(7)      47   402M                                                                                                             
+    8(8)      47   402M                                                                                                             
+    9(9)      47   402M                                                                                                             
+   10(A)      47   402M                                                                                                             
+   11(B)      47   402M                                                                                                             
+   12(C)      47    48M   49U  402M                                                                                                 
+   13(D)      47    51    53M  400M  400   401   402                                                                                
+   14(E)      47    50M   51    52    52    53    77M   78M   78N   79M   79N   80    80M   81M   82   154M  181M  284M             
+             293M  302M  311M  320M  329M  338M  349M  359M  373M  382M  401M  404B  622B                                           
+   15(F)      47    48    98M  111M  111   131M  131   152M  152   153M  154B  179M  179   180M  181B  282M  282   283M             
+             284B  291M  291   292M  293B  300M  300   301M  302B  309M  309   310M  311B  318M  318   319M  320B  327M             
+             327   328M  329B  336M  336   337M  338B  347M  347   348M  349B  357M  357   358M  359B  371M  371   372M             
+             373B  380M  380   381M  382B  399M  399                                                                                
+
+                                  Diagnostic Cross Reference and Assembler Summary                             Page   20            
+
+
+                                                                                            HLASM R6.0  2023/11/30 00.53            
+
+     No Statements Flagged in this Assembly                                                                                         
+HIGH LEVEL ASSEMBLER, 5696-234, RELEASE 6.0, PTF UI90738                                                                            
+
+SYSTEM: z/OS 02.05.00              JOBNAME: KC03CADA    STEPNAME: STEP01     PROCSTEP: (NOPROC)                                     
+
+Unicode Module:   ASMA047C   From Page     1148   To Page    17584           ECECP: International 1                                 
+Data Sets Allocated for this Assembly                                                                                               
+ Con DDname   Data Set Name                                Volume  Member                                                           
+  P1 SYSIN    KC03CAD.KC03CADA.JOB07971.D0000101.?                                                                                  
+  L1 SYSLIB   SYS1.MACLIB                                  VTMVSC                                                                   
+     SYSLIN   SYS23334.T005325.RA000.KC03CADA.OBJMOD2.H01  KCTR01                                                                   
+     SYSPRINT KC03CAD.KC03CADA.JOB07971.D0000102.?                                                                                  
+                                                                                                                                    
+  26728K allocated to Buffer Pool       Storage required     640K                                                                   
+    425 Primary Input Records Read         4738 Library Records Read                  0 Work File Reads                             
+      0 ASMAOPT Records Read                701 Primary Print Records Written         0 Work File Writes                            
+     58 Object Records Written                0 ADATA Records Written                                                               
+
+Assembly Start Time: 00.53.26 Stop Time: 00.53.26 Processor Time: 01.11.34.9672                                                     
+Return Code 000                                                                                                                     
+
+z/OS V2 R5 BINDER     00:53:25 THURSDAY NOVEMBER 30, 2023                                                               
+BATCH EMULATOR  JOB(KC03CADA) STEP(STEP02  ) PGM= HEWL                                                                  
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                *** O P E R A T I O N   S U M M A R Y   R E P O R T ***                                 
+                                                                                                                        
+
+PROCESSING OPTIONS:                                                                                                     
+                                                                                                                        
+   ALIASES             NO                                                                                               
+   ALIGN2              NO                                                                                               
+   AMODE               UNSPECIFIED                                                                                      
+   CALL                YES                                                                                              
+   CASE                UPPER                                                                                            
+   COMPAT              UNSPECIFIED                                                                                      
+   COMPRESS            AUTO                                                                                             
+   DCBS                NO                                                                                               
+   DYNAM               NO                                                                                               
+   EXTATTR             UNSPECIFIED                                                                                      
+   EXITS:              NONE                                                                                             
+   FILL                NONE                                                                                             
+   GID                 UNSPECIFIED                                                                                      
+   HOBSET              NO                                                                                               
+   INFO                NO                                                                                               
+   LET                 04                                                                                               
+   LINECT              060                                                                                              
+   LIST                SUMMARY                                                                                          
+   LISTPRIV            NO                                                                                               
+   LONGPARM            NO                                                                                               
+   MAP                 NO                                                                                               
+   MAXBLK              032760                                                                                           
+   MODMAP              NO                                                                                               
+   MSGLEVEL            00                                                                                               
+   OVLY                NO                                                                                               
+   PRINT               YES                                                                                              
+   RES                 NO                                                                                               
+   REUSABILITY         UNSPECIFIED                                                                                      
+   RMODE               UNSPECIFIED                                                                                      
+   RMODEX              NO                                                                                               
+   SIGN                NO                                                                                               
+   STORENX             NOREPLACE                                                                                        
+   STRIPCL             NO                                                                                               
+   STRIPSEC            NO                                                                                               
+   SYMTRACE                                                                                                             
+   TERM                NO                                                                                               
+   TRAP                ON                                                                                               
+   UID                 UNSPECIFIED                                                                                      
+   UPCASE              NO                                                                                               
+   WKSPACE             000000K,000000K                                                                                  
+   XCAL                NO                                                                                               
+   XREF                NO                                                                                               
+   ***END OF OPTIONS***                                                                                                 
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+
+SAVE OPERATION SUMMARY:                                                                                                 
+                                                                                                                        
+   MEMBER NAME         SALESRPT                                                                                         
+   LOAD LIBRARY        KC03CAD.CSCI465.LOADLIB                                                                          
+   PROGRAM TYPE        PROGRAM OBJECT(FORMAT 2)                                                                         
+   VOLUME SERIAL       KCTR50                                                                                           
+   DISPOSITION         REPLACED                                                                                         
+   TIME OF SAVE        00.53.26  NOV 30, 2023                                                                           
+                                                                                                                        
+                                                                                                                        
+
+SAVE MODULE ATTRIBUTES:                                                                                                 
+                                                                                                                        
+   AC                  000                                                                                              
+   AMODE                24                                                                                              
+   COMPRESSION         NONE                                                                                             
+   DC                  NO                                                                                               
+   EDITABLE            YES                                                                                              
+   EXCEEDS 16MB        NO                                                                                               
+   EXECUTABLE          YES                                                                                              
+   LONGPARM            NO                                                                                               
+   MIGRATABLE          YES                                                                                              
+   OL                  NO                                                                                               
+   OVLY                NO                                                                                               
+   PACK,PRIME          NO,NO                                                                                            
+   PAGE ALIGN          NO                                                                                               
+   REFR                NO                                                                                               
+   RENT                NO                                                                                               
+   REUS                NO                                                                                               
+   RMODE                24                                                                                              
+   SCTR                NO                                                                                               
+   SIGN                NO                                                                                               
+   SSI                                                                                                                  
+   SYM GENERATED       NO                                                                                               
+   TEST                NO                                                                                               
+   XPLINK              NO                                                                                               
+   MODULE SIZE (HEX)   00000B78                                                                                         
+   DASD SIZE (HEX)     00002000                                                                                         
+                                                                                                                        
+                                                                                                                        
+
+ ENTRY POINT AND ALIAS SUMMARY:                                                                                         
+                                                                                                                        
+ NAME:            ENTRY TYPE AMODE C_OFFSET CLASS NAME        STATUS                                                    
+                                                                                                                        
+ SALESRPT          MAIN_EP      24 00000000 B_TEXT                                                                      
+                                                                                                                        
+                         *** E N D   O F   O P E R A T I O N   S U M M A R Y   R E P O R T ***                          
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+
+z/OS V2 R5 BINDER     00:53:25 THURSDAY NOVEMBER 30, 2023                                                               
+BATCH EMULATOR  JOB(KC03CADA) STEP(STEP02  ) PGM= HEWL                                                                  
+IEW2008I 0F03 PROCESSING COMPLETED.  RETURN CODE =  0.                                                                  
+                                                                                                                        
+                                                                                                                        
+                                                                                                                        
+
+----------------------                                                                                                  
+MESSAGE SUMMARY REPORT                                                                                                  
+----------------------                                                                                                  
+ TERMINAL MESSAGES      (SEVERITY = 16)                                                                                 
+ NONE                                                                                                                   
+                                                                                                                        
+ SEVERE MESSAGES        (SEVERITY = 12)                                                                                 
+ NONE                                                                                                                   
+                                                                                                                        
+ ERROR MESSAGES         (SEVERITY = 08)                                                                                 
+ NONE                                                                                                                   
+                                                                                                                        
+ WARNING MESSAGES       (SEVERITY = 04)                                                                                 
+ NONE                                                                                                                   
+                                                                                                                        
+ INFORMATIONAL MESSAGES (SEVERITY = 00)                                                                                 
+ 2008                                                                                                                   
+                                                                                                                        
+                                                                                                                        
+ **** END OF MESSAGE SUMMARY REPORT ****                                                                                
+                                                                                                                        
+                                                 WASHINGTON & LINCOLN INVESTMENT                                          PAGE:     
+                                               BROKER SALES AND COMMISSIONS REPORT                                JOBNAME: KC03CADA 
+                                                                                                                                    
+                                                      SHARE PRICE:  $9.35                                                         
+                                                                                                                                    
+BRANCH NAME                      BROKER NAME                       DEPOSIT AMOUNT               SHARE AMOUNT              COMMISSION
+
+
+--------------------             -------------------------         --------------         ------------------          --------------
+
+Athens, Greece                   George Schipodokas                    $1,124.71                      120.2900         0            
+
+Athens, Greece                   Boodra Makedonas                      $3,704.71                      396.2260         0            
+
+Athens, Greece                   Aristotle Onassis                    $14,173.13                    1,515.8430         0            
+
+Athens, Greece                   Maria Callas                         $15,401.52                    1,647.2210         0            
+
+Athens, Greece                   Kostas Dalaras                        $7,740.68                      827.8800         0            
+
+Athens, Greece                   Peter Bogdonas                        $2,334.72                      249.7030         0            
+
+Berlin, Germany                  Erich Kleiber                        $93,618.48                   10,012.6720         0            
+
+Berlin, Germany                  Wilhelm Furtwaengler                $716,614.94                   76,643.3090         0            
+
+Berlin, Germany                  Adolph Dege                          $80,821.35                    8,643.9950         0            
+
+Berlin, Germany                  Johannes Klopp                      $400,870.20                   42,873.8180         0            
+
+Berlin, Germany                  Eugen Jochum                      $9,999,999.99                1,069,518.7160         0            
+
+Bonn, Germany                    Ludwig van Beethoven                  $4,061.21                      434.3540         0            
+
+Bonn, Germany                    Uwe Schmidt                         $207,430.39                   22,185.0680         0            
+
+Bonn, Germany                    Helga Dernesch                          $841.52                       90.0020         0            
+
+Bonn, Germany                    Richard Strauss                     $310,814.02                   33,242.1410         0            
+
+Chicago, U.S.                    Maurizio Damilano                 $4,000,081.02                  427,816.1520         0            
+
+Chicago, U.S.                    Chi Yen Weh                         $431,081.00                   46,104.9200         0            
+
+Chicago, U.S.                    Steve Peplowski                     $241,001.21                   25,775.5300         0            
+                                                 WASHINGTON & LINCOLN INVESTMENT                                          PAGE:     
+                                               BROKER SALES AND COMMISSIONS REPORT                                JOBNAME: KC03CADA 
+                                                                                                                                    
+                                                      SHARE PRICE:  $9.35                                                         
+                                                                                                                                    
+BRANCH NAME                      BROKER NAME                       DEPOSIT AMOUNT               SHARE AMOUNT              COMMISSION
+
+
+--------------------             -------------------------         --------------         ------------------          --------------
+
+Chicago, U.S.                    Michael Smith                       $314,081.22                   33,591.5740         0            
+
+Chicago, U.S.                    Charles Medley                      $310,481.23                   33,206.5490         0            
+
+Chicago, U.S.                    Risa Rogan                          $310,841.24                   33,245.0520         0            
+
+Chicago, U.S.                    Theodore Thomas                     $310,814.25                   33,242.1660         0            
+
+Chicago, U.S.                    Frederick Stock                     $310,812.46                   33,241.9740         0            
+
+Dublin, Ireland                  Billy O'Leary                       $310,821.42                   33,242.9330         0            
+
+Dublin, Ireland                  Anna Owen                           $331,083.14                   35,409.9610         0            
+
+Belfast, N. Ireland              Chet Manassas                        $51,223.41                    5,478.4400         0            
+
+Belfast, N. Ireland              Shelley Mann                        $330,000.52                   35,294.1730         0            
+
+Belfast, N. Ireland              Philip Battenberg                     $3,111.60                      332.7910         0            
+
+Edinburgh, U.K.                  Billy Connolly                      $310,381.72                   33,195.9060         0            
+
+Edinburgh, U.K.                  Omar Sharif                         $310,831.12                   33,243.9700         0            
+
+Edinburgh, U.K.                  Julie Christie                      $310,813.12                   33,242.0450         0            
+
+Edinburgh, U.K.                  James Oxfordshire                   $310,811.32                   33,241.8520         0            
+
+Frankfurt, Germany               Johannes Dundor                     $460,641.05                   49,266.4220         0            
+
+Frankfurt, Germany               Gretel Decker                       $180,764.08                   19,333.0570         0            
+
+Frankfurt, Germany               Adam Dieffenbach                    $606,825.41                   64,901.1130         0            
+
+Hong Kong, China                 Mao Zedong                          $608,627.12                   65,093.8100         0            
+                                                 WASHINGTON & LINCOLN INVESTMENT                                          PAGE:     
+                                               BROKER SALES AND COMMISSIONS REPORT                                JOBNAME: KC03CADA 
+                                                                                                                                    
+                                                      SHARE PRICE:  $9.35                                                         
+                                                                                                                                    
+BRANCH NAME                      BROKER NAME                       DEPOSIT AMOUNT               SHARE AMOUNT              COMMISSION
+
+
+--------------------             -------------------------         --------------         ------------------          --------------
+
+Hong Kong, China                 Zhou Enlai                          $608,266.12                   65,055.2000         0            
+
+Hong Kong, China                 Zhau Ziyang                         $698,276.12                   74,681.9380         0            
+
+Hong Kong, China                 Chiang Kai-shek                   $2,618,281.62                  280,030.1200         0            
+
+Hong Kong, China                 Gau-Yin Lau                          $60,829.12                    6,505.7880         0            
+
+Hong Kong, China                 Stephanie Buckingham                $460,821.23                   49,285.6930         0            
+
+Hong Kong, China                 Simon Draper                        $640,821.23                   68,537.0300         0            
+
+London, U.K.                     Elizabeth Windsor                   $714,492.35                   76,416.2940         0            
+
+London, U.K.                     Charles Windsor                     $217,916.20                   23,306.5450         0            
+
+London, U.K.                     Andrew Windsor                      $661,102.24                   70,706.1220         0            
+
+London, U.K.                     Michael Windsor                   $1,066,362.25                  114,049.4390         0            
+
+London, U.K.                     Phillip Windsor                     $116,641.61                   12,475.0390         0            
+
+London, U.K.                     William Windsor                     $221,661.72                   23,707.1360         0            
+
+Los Angeles, U.S.                William Mills                       $111,966.78                   11,975.0570         0            
+
+Los Angeles, U.S.                Catherine Monteiro                $9,999,999.99                1,069,518.7160         0            
+
+Los Angeles, U.S.                Jason Landau                        $500,000.78                   53,476.0190         0            
+
+Los Angeles, U.S.                Trevor Pinnicle                     $150,000.00                   16,042.7810         0            
+
+Kyiv, Ukraine                    Yvgeny Yevtushenko                  $135,191.78                   14,459.0140         0            
+
+Kyiv, Ukraine                    Vladimir Ashkenazy                  $111,591.78                   11,934.9500         0            
+                                                 WASHINGTON & LINCOLN INVESTMENT                                          PAGE:     
+                                               BROKER SALES AND COMMISSIONS REPORT                                JOBNAME: KC03CADA 
+                                                                                                                                    
+                                                      SHARE PRICE:  $9.35                                                         
+                                                                                                                                    
+BRANCH NAME                      BROKER NAME                       DEPOSIT AMOUNT               SHARE AMOUNT              COMMISSION
+
+
+--------------------             -------------------------         --------------         ------------------          --------------
+
+Kyiv, Ukraine                    Serge Rachmaninov                    $11,951.78                    1,278.2650         0            
+
+Kyiv, Ukraine                    Leo Tolstoy                         $101,915.77                   10,900.0820         0            
+
+Kyiv, Ukraine                    Fyodor Dostoevsky                    $11,333.63                    1,212.1530         0            
+
+Kyiv, Ukraine                    Dmitri Shostakovich                 $181,194.74                   19,379.1170         0            
+
+New York, U.S.                   Gary Graffman                       $118,191.78                   12,640.8320         0            
+
+New York, U.S.                   Andre Previn                        $232,821.78                   24,900.7250         0            
+
+New York, U.S.                   Samuel Jefferson                     $99,989.99                   10,694.1170         0            
+
+New York, U.S.                   John Adams                          $111,978.78                   11,976.3400         0            
+
+New York, U.S.                   Cheryl Studer                       $301,491.78                   32,245.1100         0            
+
+New York, U.S.                   Renee Fleming                       $331,121.78                   35,414.0940         0            
+
+New York, U.S.                   Birgit Nilsson                       $33,194.48                    3,550.2120         0            
+
+New York, U.S.                   Christa Ludwig                      $113,391.74                   12,127.4590         0            
+
+New York, U.S.                   James Conlon                         $99,939.99                   10,688.7690         0            
+
+New York, U.S.                   Leonard Bernstein                   $111,913.78                   11,969.3880         0            
+
+Paris, France                    Napoleon Bonaparte                $1,007,309.30                  107,733.6150         0            
+
+Paris, France                    Claude Monet                      $3,001,251.86                  320,989.5040         0            
+
+Paris, France                    Olivier Messiaen                    $300,141.60                   32,100.7060         0            
+
+Paris, France                    Claude Debussy                      $930,781.55                   99,548.8290         0            
+                                                 WASHINGTON & LINCOLN INVESTMENT                                          PAGE:     
+                                               BROKER SALES AND COMMISSIONS REPORT                                JOBNAME: KC03CADA 
+                                                                                                                                    
+                                                      SHARE PRICE:  $9.35                                                         
+                                                                                                                                    
+BRANCH NAME                      BROKER NAME                       DEPOSIT AMOUNT               SHARE AMOUNT              COMMISSION
+
+
+--------------------             -------------------------         --------------         ------------------          --------------
+
+Paris, France                    Maurice Ravel                     $1,003,012.22                  107,274.0340         0            
+
+Paris, France                    Edith Piaf                          $263,340.33                   28,164.7410         0            
+
+Paris, France                    Coco Chanel                         $226,130.54                   24,185.0840         0            
+
+Sao Paulo, Brazil                Joao Castagneto                       $3,103.55                      331.9300         0            
+
+Sao Paulo, Brazil                Lasar Segall                          $6,105.37                      652.9810         0            
+
+Sao Paulo, Brazil                Tarsila do Amaral                   $300,010.58                   32,086.6930         0            
+
+Sao Paulo, Brazil                Eliseu Visconti                      $32,230.54                    3,447.1170         0            
+
+Rome, Italy                      Julius Caesar                       $203,410.65                   21,755.1500         0            
+
+Rome, Italy                      Franco Sinatra                        $4,310.55                      461.0210         0            
+
+Rome, Italy                      Giacomo Puccini                      $30,460.45                    3,257.8020         0            
+
+Rome, Italy                      Enrico Caruso                        $88,413.35                    9,455.9730         0            
+
+Rome, Italy                      Sofia Loren                         $900,415.25                   96,301.0960         0            
+
+Sydney, Australia                Milton Sheppard                      $90,460.65                    9,674.9360         0            
+
+Sydney, Australia                Shelley Boughton                      $9,810.58                    1,049.2600         0            
+
+Sydney, Australia                Joan Sutherland                       $2,910.55                      311.2890         0            
+
+Sydney, Australia                Barry Tuckwell                        $9,190.54                      982.9450         0            
+
+Sydney, Australia                Cayla Smithe                          $2,109.59                      225.6250         0            
+
+Sydney, Australia                Benjamin Britten                      $4,105.94                      439.1380         0            
+                                                 WASHINGTON & LINCOLN INVESTMENT                                          PAGE:     
+                                               BROKER SALES AND COMMISSIONS REPORT                                JOBNAME: KC03CADA 
+                                                                                                                                    
+                                                      SHARE PRICE:  $9.35                                                         
+                                                                                                                                    
+BRANCH NAME                      BROKER NAME                       DEPOSIT AMOUNT               SHARE AMOUNT              COMMISSION
+
+
+--------------------             -------------------------         --------------         ------------------          --------------
+
+Sydney, Australia                Peter Pears                           $4,930.56                      527.3330         0            
+
+Sydney, Australia                Paul Gray                            $90,310.45                    9,658.8720         0            
+
+Vienna, Austria                  Herbert von Karajan                   $9,580.28                    1,024.6290         0            
+
+Vienna, Austria                  Franz Joseph Haydn                    $5,890.30                      629.9790         0            
+
+Vienna, Austria                  Josef Strauss                        $15,809.48                    1,690.8530         0            
+
+Vienna, Austria                  Karl Boehm                          $505,808.96                   54,097.2150         0            
+
+Vienna, Austria                  Elisabeth Schwarzkopf                $12,480.29                    1,334.7900         0            
+
+Vienna, Austria                  Franz Peter Schubert                  $9,831.05                    1,051.4490         0            
+
+Zurich, Switzerland              Earl Grey                           $400,058.01                   42,786.9530         0            
+
+Zurich, Switzerland              Diana Kensington                     $87,057.55                    9,310.9680         0            
+
+Zurich, Switzerland              Axel Vondenberg                      $30,759.01                    3,289.7340         0            
+
+Zurich, Switzerland              Ute Schweitzer                      $147,058.00                   15,728.1280         0            
+
+Zurich, Switzerland              Rene Jacobs                          $72,558.00                    7,760.2140         0            
+
+Zurich, Switzerland              Anton Bruckner                       $99,999.99                   10,695.1860         0            
+                                                                                                                                    
+                                                 WASHINGTON & LINCOLN INVESTMENT                                          PAGE:     
+
