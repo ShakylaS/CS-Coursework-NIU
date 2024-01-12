@@ -35,8 +35,8 @@
 //SYSIN   DD *
       ***************************************************************
       *                                                             *
-      * PROGRAM NAME: SALESRPT      			    	            *
-      * PROGRAMMER:   Shakyla Smith-Bardney			                *
+      * PROGRAM NAME: SALESRPT      			     	        *
+      * PROGRAMMER:   Shakyla Smith-Bardney			             *
       * DUE DATE:     10/11/2023                                    *
       *                                                             *
       * FUNCTION: THIS PROGRAM READS INPUT DATA RECORDS             *
