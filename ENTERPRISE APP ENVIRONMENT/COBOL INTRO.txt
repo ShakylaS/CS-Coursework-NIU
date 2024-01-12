@@ -1,0 +1,211 @@
+//KC03CADA JOB ,'S. SMITH-BARDNEY',MSGCLASS=H
+//*
+//*******************************************************************
+//*                                                                 *
+//*  CSCI 465 PE1       ASSIGNMENT 4            Fall 2023           *
+//*                   COBOL Introduction                            *
+//*                                                                 *
+//*  DEVELOPER NAME: SHAKYLA SMITH-BARDNEY                          *
+//*        DUE DATE: 10/11/2023                                     *
+//*                                                                 *
+//*  PURPOSE: This COBOL program will create a report based on info *
+//*           contained in a input file with a unknown number of    *
+//*           records.                                              *
+//*                                                                 *
+//*                                                                 *
+//*******************************************************************
+//*
+//STEP01  EXEC PGM=IGYCRCTL,REGION=0M
+//*
+//*******************************************************************
+//*                                                                 *
+//* STEP01 COMPILES THE COBOL SOURCE CODE USING THE CURRENT COBOL   *
+//* COMPILER.                                                       *
+//*                                                                 *
+//* DD NAME             FILE DESCRIPTION                            *
+//* SYSPRINT OUTPUT:    SOURCE LISTING AND DIAGNOSTIC MSGS          *
+//* SYSLIN   OUTPUT:    RESULTING TEMP OBJECT MODULE                *
+//*                                                                 *
+//*******************************************************************
+//*
+//STEPLIB DD DSN=IGY630.SIGYCOMP,DISP=SHR
+//        DD DSN=CEE.SCEERUN,DISP=SHR
+//        DD DSN=CEE.SCEERUN2,DISP=SHR
+//*
+//SYSIN   DD *
+      ***************************************************************
+      *                                                             *
+      * PROGRAM NAME: SALESRPT      			    	            *
+      * PROGRAMMER:   Shakyla Smith-Bardney			                *
+      * DUE DATE:     10/11/2023                                    *
+      *                                                             *
+      * FUNCTION: THIS PROGRAM READS INPUT DATA RECORDS             *
+      *           AND THEN WRITES THEM TO STANDARD OUTPUT.          *
+      *                                                             *
+      * INPUT: INDATA - THE INPUT DATA RECORDS READ IN.             *
+      *                                                             *
+      * OUTPUT: OUTDATA - THE INPUT DATA RECORDS WRITTEN            *
+      *                   OUT.                                      *
+      *                                                             *
+      * NOTES: NONE                                                 *
+      *                                                             *
+      ***************************************************************
+
+       IDENTIFICATION DIVISION.
+
+       PROGRAM-ID.    SALESRPT.
+       AUTHOR.        Shakyla Smith-Bardney.
+       DATE-WRITTEN.  10/11/2023.
+       DATE-COMPILED. 10/11/2023
+
+       ENVIRONMENT DIVISION.
+
+       INPUT-OUTPUT SECTION.
+
+       FILE-CONTROL.
+
+           SELECT SALES-FILE ASSIGN TO SALESFLE.
+           SELECT REPORT-FILE ASSIGN TO RPTFILE.
+
+       DATA DIVISION.
+
+       FILE SECTION.
+
+       FD   SALES-FILE
+            RECORDING MODE F.
+
+       01   SALES-RECORD.
+            05 IN-BRANCH-NME      PIC X(20).
+            05 IN-BROKER-NME      PIC X(25).
+            05 IN-DEP-AMT         PIC S9(8)V99.
+            05                    PIC X(25).
+
+       FD   REPORT-FILE
+            RECORDING MODE F.
+
+       01   REPORT-RECORD         PIC X(132).
+
+       WORKING-STORAGE SECTION.
+       01   EOF-FLAG              PIC X(1)   VALUE 'N'.
+
+       01   DETAIL-LINE.
+            05   OUT-BRANCH-NME   PIC X(20).
+            05                    PIC X(15) VALUE SPACES.
+            05   OUT-BROKER-NME   PIC X(25).
+            05                    PIC X(15) VALUE SPACES.
+            05   OUT-DEP-AMT      PIC $$$,$$$,$$9.99.
+            05                    PIC X(80)  VALUE SPACES.
+
+       PROCEDURE DIVISION.
+       0000-MAIN.
+
+           OPEN INPUT  SALES-FILE.
+           OPEN OUTPUT REPORT-FILE.
+
+           PERFORM UNTIL EOF-FLAG = 'Y'
+              READ SALES-FILE
+                  AT END
+                     MOVE 'Y' TO EOF-FLAG
+                  NOT AT END
+                     PERFORM 0100-PROCESS-RECORD
+              END-READ
+           END-PERFORM.
+
+           CLOSE SALES-FILE.
+           CLOSE REPORT-FILE.
+
+            MOVE 0 TO  RETURN-CODE.
+
+           STOP RUN.
+
+       0000-EXIT. EXIT.
+
+       0100-PROCESS-RECORD.
+
+            MOVE IN-BRANCH-NME TO OUT-BRANCH-NME.
+            MOVE IN-BROKER-NME TO OUT-BROKER-NME.
+            MOVE IN-DEP-AMT TO OUT-DEP-AMT.
+            WRITE REPORT-RECORD FROM DETAIL-LINE AFTER 2.
+
+
+       0100-EXIT. EXIT.
+
+/*
+//SYSPRINT DD SYSOUT=*
+//*
+//SYSLIN   DD DSN=&&OBJMOD,SPACE=(CYL,(1,1)),
+//            DISP=(MOD,PASS)
+//*
+//*******************************************************************
+//*                                                                 *
+//* THE FOLLOWING DATA SETS ARE REQUIRED BY COMPLIER                *
+//*                                                                 *
+//*******************************************************************
+//*
+//SYSUT1   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT2   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT3   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT4   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT5   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT6   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT7   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT8   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT9   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT10  DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT11  DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT12  DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT13  DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT14  DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSUT15  DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//*
+//SYSMDECK DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//*
+//STEP02   EXEC PGM=IEWBLINK,COND=(0,LT)
+//*
+//*******************************************************************
+//*                                                                 *
+//* STEP02 CREATES A LOAD MODULE FROM INPUT OBJECT MODULE AND       *
+//* STORES IT AS A PROGRAM OBJECT.                                  *
+//*                                                                 *
+//* SYSLIB  INPUT:      LOAD MODULE LIBRARIES NEEDED BY LOADER FOR  *
+//*                     COBOL OBJECT MODULE                         *
+//* SYSLIN  INPUT:      THE OBJECT MODULE                           *
+//* SYSLMOD OUTPUT:     RESULTING LOAD MODULE CREATED BY BINDER     *
+//*                                                                 *
+//*******************************************************************
+//*
+//SYSLIB   DD DSN=CEE.SCEELKEX,DISP=SHR
+//         DD DSN=CEE.SCEELKED,DISP=SHR
+//*
+//SYSLIN   DD DSN=&&OBJMOD,DISP=(MOD,PASS)
+//*
+//SYSPRINT DD SYSOUT=*
+//*
+//SYSLMOD  DD DSN=KC03CAD.CSCI465.LOADLIB(SALESRPT),
+//            SPACE=(1024,(50,20,1)),DSNTYPE=LIBRARY,
+//            DISP=(MOD,KEEP,KEEP)
+//*
+//STEP03  EXEC PGM=SALESRPT,COND=(0,LT)
+//*
+//*******************************************************************
+//*                                                                 *
+//*  STEP03 THE FOLLOWING DATA SETS ARE REQUIRED BY THE COBOL       *
+//*  PROGRAM TO EXECUTE THE LOAD MODULE.                            *
+//*                                                                 *
+//*  STEPLIB   INPUT:   LOCATION OF THE PROGRAM OBJECT              *
+//*  INDATA    INPUT:   INPUT FILE                                  *
+//*                                                                 *
+//*  RPTDATA   OUTPUT:  PRINT TO STANDARD OUTPUT                    *
+//*                                                                 *
+//*  SYSUDUMP  OUTPUT:  FOR A SYSTEM DUMP IF ABEND                  *
+//*                                                                 *
+//*******************************************************************
+//*
+//STEPLIB DD DSN=KC03CAD.CSCI465.LOADLIB,DISP=SHR
+//*
+//SALESFLE  DD DSN=KC02322.CSCI465.DATAFA23(DATA4),DISP=SHR
+//*
+//RPTFILE DD SYSOUT=*
+//*
+//SYSDUMP DD SYSOUT=*
+//
