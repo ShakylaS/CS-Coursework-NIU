@@ -37,7 +37,7 @@
       *                                                             *
       * PROGRAM NAME: SALESRPT      			     	        *
       * PROGRAMMER:   Shakyla Smith-Bardney			             *
-      * DUE DATE:     10/11/2023                           *
+      * DUE DATE:     10/11/2023                                    *
       *                                                             *
       * FUNCTION: THIS PROGRAM READS INPUT DATA RECORDS             *
       *           AND THEN WRITES THEM TO STANDARD OUTPUT.          *
