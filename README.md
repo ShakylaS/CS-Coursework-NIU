@@ -9,3 +9,7 @@ ENTERPRISE APPLICATION ENVIRONMENTS COURSEOWRK
 
   -  COBOL TABLES AND SUBPROGRAMS -  A COBOL program that processes a sales transaction file and generates two reports. The program reads from an input file, processes each record, and writes output to two report files.
        The program interacts with other programs or subroutines, written in Assembler / COBOL, to perform additional calculations or processing.
+
+DATABASES COURSEWORK
+- The project involves designing a pet store shopping website using PHP, HTML, and CSS, and creating a Relational Database Management System (RDBMS) using SQL. The PHP code, interacts with the SQL database to retrieve the items for sale, add 
+  items to the user's cart, process the checkout, and update the database.
