@@ -10,6 +10,13 @@ ENTERPRISE APPLICATION ENVIRONMENTS COURSEOWRK
   -  COBOL TABLES AND SUBPROGRAMS -  A COBOL program that processes a sales transaction file and generates two reports. The program reads from an input file, processes each record, and writes output to two report files.
        The program interacts with other programs or subroutines, written in Assembler / COBOL, to perform additional calculations or processing.
 
+OPERATING SYSTEMS COURSEWORK
+  - MULTITHREADING READER - WRITERS PROBLEM - A multithreaded program that simulates the readers-writers problem. This program creates a specified number of reader and writer threads.
+      It uses a shared string as the shared resource. The program uses semaphores for synchronization to ensure that:
+        Multiple readers can read the string simultaneously.
+        Only one writer can write to the string at a time.
+        A writer has exclusive access to the string when it's writing.
+
 DATABASES COURSEWORK
 - The project involves designing a pet store shopping website using PHP, HTML, and CSS, and creating a Relational Database Management System (RDBMS) using SQL. The PHP code, interacts with the SQL database to retrieve the items for sale, add 
   items to the user's cart, process the checkout, and update the database.
