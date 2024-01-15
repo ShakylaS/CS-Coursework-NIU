@@ -20,3 +20,9 @@ OPERATING SYSTEMS COURSEWORK
 DATABASES COURSEWORK
 - The project involves designing a pet store shopping website using PHP, HTML, and CSS, and creating a Relational Database Management System (RDBMS) using SQL. The PHP code, interacts with the SQL database to retrieve the items for sale, add 
   items to the user's cart, process the checkout, and update the database.
+
+  SECURITY BASICS
+  - CAMELLIA ENCRYPTION - DECRYPTION - This C++ program measures the performance of the Camellia encryption algorithm. It prepares a key and a plaintext message, then encrypts the message 1000 times, recording the time taken for each 
+      encryption. After all encryptions, it calculates the average time taken per encryption. The result is then printed out in nanoseconds.
+  - AES ENCRYPTION - DECRYPTION - This C++ program measures the performance of the AES encryption and decryption algorithm. It first encrypts a plaintext message multiple times, recording the time taken for each encryption, and then 
+      calculates and prints the average encryption time. The process is repeated for decryption. Finally, it decrypts the ciphertext one last time and prints the resulting plaintext to verify correctness.
